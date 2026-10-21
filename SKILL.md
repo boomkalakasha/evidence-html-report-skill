@@ -1,11 +1,18 @@
 ---
 name: evidence-html-report
-description: 用于交付结论清楚、证据可追溯的离线单文件 HTML 报告，适合复杂审计、架构评估、技术方案简报、真实场景交接、复盘和发版评审；需要调用链、职责与验收表、可搜索的问题台账、详情抽屉或折叠附录时使用。简短问答和小修改不强制生成报告。
+description: 已停止维护的历史 HTML 报告 Skill；新任务推荐 answer-me-with-html。不再主动选用，仅在用户明确要求读取或维护旧版报告时参考。
 metadata:
   version: "1.3.0"
+  status: deprecated
+  deprecated_at: "2026-10-21"
+  replacement: https://github.com/QingYunA/answer-me-with-html
 ---
 
 # 证据型 HTML 报告
+
+> **已停止维护（2026-10-21）**：今后不再更新或提供修复。新任务优先使用独立的 [answer-me-with-html](https://github.com/QingYunA/answer-me-with-html)，先读取该 Skill 的当前说明；不要根据名称假定它已经安装，也不要自动安装或启用。
+>
+> 下文仅保留历史规则。用户明确要求维护旧报告时可参考；保留旧报告和原始材料，不把旧 JSON 视为新项目兼容输入。
 
 让读者先看懂结论、方案和下一步，再按需追溯证据。默认以中文呈现，结构随报告用途调整。
 

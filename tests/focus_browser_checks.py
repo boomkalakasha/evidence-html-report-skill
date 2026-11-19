@@ -3,7 +3,7 @@ import argparse
 import importlib.util
 import json
 from pathlib import Path
-from playwright.sync_api import sync_playwright, Error
+from playwright.sync_api import sync_playwright, Error, expect
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('builder', ROOT / 'scripts/build_report.py')
@@ -56,7 +56,9 @@ def run(output):
             nav=page.locator('#report-outline nav').inner_text()
             page.locator('#report-outline nav a[href="#bounds"]').click()
             check(active(page).get_attribute('id')=='bounds' and not page.locator('#chapter-dialog').is_visible(),'navigation replaces main area without chapter overlay')
+            expect(page.locator('#bounds h2')).to_be_focused(timeout=3000)
             check(page.locator('#bounds h2').evaluate('(e)=>e===document.activeElement'),'chapter heading receives keyboard focus')
+            expect(page.locator('#bounds h2')).to_be_focused(timeout=3000)
             check(page.locator('#bounds h2').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>page.locator('#bounds .section-subtitle').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)'),'subtitle is visually secondary')
             check(page.locator('#bounds h2 .heading-help').count()==0 and page.locator('#bounds .nav-subtitle').is_visible(),'main title has a visible secondary subtitle without question controls')
             heading_note=page.locator('#report-outline nav li').filter(has=page.locator('a[href="#bounds"]')).locator('.nav-note')
@@ -85,6 +87,7 @@ def run(output):
             target=citation.get_attribute('href')[1:]
             citation.click()
             check(page.locator('#'+target).evaluate('(e)=>e.closest("[data-chapter]").id')=='bounds','citation jumps to sources in same chapter')
+            expect(page.locator('#'+target)).to_be_focused(timeout=3000)
             check(page.locator('#'+target).evaluate('(e)=>e===document.activeElement'),'source destination receives focus')
             term=page.locator('#bounds a.term').first
             term.hover(); check(page.locator('#term-popover').is_visible(),'existing underlined terminology preview works')

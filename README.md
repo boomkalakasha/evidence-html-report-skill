@@ -1,93 +1,89 @@
 # Evidence HTML Report · 证据型 HTML 报告
 
-**先让团队看懂结论，需要追问时，每个重要判断都有出处。**
+![BOOMKALAKASHA](docs/assets/brand/watermark-auto.svg)
 
-这是一个面向 Codex 的 Skill。它把技术方案、审计复盘或团队交接整理成一份离线 HTML：读者先看「核心结论」和下一步，再按主题查详情，或沿正文编号回到依据。收件人用浏览器打开即可，无需安装 Codex 或运行服务。
+[简体中文](README.zh-CN.md) · [Quick start](#quick-start) · [Installation](#installation) · [User guide](#user-guide) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
 
-[看报告示例](#看一份报告) · [安装到 Codex](#安装到-codex) · [写第一份报告](#写第一份报告) · [从-json-生成](#从-json-生成) · [常见问题](#常见问题)
+> **Give the team the conclusion first. Give every important claim a place to check.**
 
-## 看一份报告
-
-比如团队要决定：**把新的处理能力并入现有服务，还是另起一个服务？** 汇报人需要先给推荐，开发要看接入边界，验收人则要知道哪些场景还没跑。用同一份报告，就能把这三件事放到各自该看的位置。
-
-![虚构接入方案的报告首屏：左边是主题目录，右边是核心结论、接法变化图、下一步和带编号的来源。](docs/images/report-preview.png)
-
-*截图由公开的[接入方案样例](examples/focus-changes.json)实际生成。图里的「待实施」是虚构方案的状态。「变更」视图高亮新增和修改的部分；可以切到「改前」或「改后」单独查看。*
-
-| 读者想知道 | 可以看哪里 |
-| --- | --- |
-| 现在怎么判断，下一步要做什么？ | 首屏的总判断、各主题一句话和必要的状态清单。 |
-| 到底改了哪些地方？ | 打开对应主题，比较改前、变更和改后。遇到需要执行的任务，就地展开步骤或验收细节。 |
-| 这句话有依据吗？ | 在句子旁看数字角标，点击到本节来源，再打开原材料或附录记录。 |
-| 还有哪些问题要处理？ | 多问题报告可搜索、筛状态，点开单项查看影响、责任和建议行动。 |
-
-材料简单、一段话或一张表就能讲清时，用普通 Markdown 即可。这个 Skill 更适合既有人只想看结论、也有人需要逐项核对的报告。
-
-## 安装到 Codex
+`evidence-html-report` is a Codex Skill for turning technical assessments, audit reviews, and handoffs into one offline HTML report. Authors work from designs, test records, or other material. Readers only need a browser to see the recommendation, explore each topic, and follow the evidence.
 
 <!-- icarus-release-fact: dynamic -->
-1. 从 [GitHub 最新正式版](https://github.com/boomkalakasha/evidence-html-report-skill/releases/latest) 下载 `evidence-html-report-v*.zip` 安装包。要让团队使用同一版，从[发布记录](https://github.com/boomkalakasha/evidence-html-report-skill/releases)选定版本，并保存对应的校验文件。
-2. 解压，把含 `SKILL.md` 的整个 `evidence-html-report/` 放进 Codex 技能目录。只给当前项目用，放在项目的 `.agents/skills/` 下；给当前用户的多个项目用，放在 `~/.agents/skills/` 下。如果已经在 `~/.codex/skills/` 使用过旧版，备份自定义文件后更新原来的目录，避免并存两份同名 Skill。
-3. 在能访问报告材料的项目中打开新会话，输入 `$evidence-html-report` 选择技能。生成端需要能运行 Python 3；阅读端只需要浏览器。
+Get the package and its checksum file from the [latest GitHub Release](https://github.com/boomkalakasha/evidence-html-report-skill/releases/latest). If your team needs a fixed version, use the ZIP and `SHA256SUMS.txt` from that version in the [release history](https://github.com/boomkalakasha/evidence-html-report-skill/releases).
 
-## 写第一份报告
+## At a glance
 
-先给 Codex 三样东西：**谁要看、要判断什么、哪些材料能支持判断**。例如：
-
-> 用 $evidence-html-report，根据这份设计稿和本地测试记录，为评审组做一份接入方案报告。先给推荐做法和最大限制，再用图说明改前与改后，按主题写职责和验收。区分本地已测、尚未验收和待实施，把重要判断连到具体出处。输出离线 HTML，并保留可重生成的 JSON。
-
-打开报告后，先读「核心结论」，再挑一句关键判断，顺着编号走到原项或附录。确认正文没有把计划当成已实施、没有把局部测试当成正式验收。转发前核对对方能否打开材料；不能共享原件时，在附录写明定位和访问限制。
-
-| 要做的报告 | 正文优先写什么 | 可运行的输入样例 |
+| If you need to… | The Skill helps you… | You get… |
 | --- | --- | --- |
-| 技术方案或变化说明 | 推荐做法、改动边界、如何验收 | [接入方案](examples/focus-changes.json) |
-| 审计与问题复盘 | 发现、影响、证据和责任 | [发布准备核验](examples/audit.json) |
-| 工作交接 | 当前状态、谁来接手、下一步怎样算完成 | [任务交接](examples/reading-layout.json) |
+| Review an integration proposal | Lead with the recommendation, then show how the scope, interfaces, and responsibilities change | A [technical report](examples/focus-changes.json) with before, changes, and after views |
+| Review release readiness | Organize individual issues by status, impact, source, and owner | A [readiness report](examples/audit.json) with filters and expandable findings |
+| Hand work to another team | Explain the current state, who owns each step, and how to check the result | A [handoff report](examples/reading-layout.json) the receiving team can act on |
 
-## 从 JSON 生成
+Use Markdown when a paragraph or small table is enough. This Skill is most useful when some readers only need the conclusion and others will check the details.
 
-不使用 Codex 也可以生成。在解压后的 Skill 目录运行以下命令，打开 `output-focus.html`。生成器只用 Python 标准库；`--strict` 会拒绝生成器不认识的字段。
+## Quick start
+
+Download and extract the release ZIP. From the `evidence-html-report/` directory containing `SKILL.md`, run this command with Python 3. You do not need Codex or extra Python packages for this example.
 
 ```text
 python scripts/build_report.py --strict examples/focus-changes.json output-focus.html
 ```
 
-要做自己的报告，可以先复制一个样例，保存为 UTF-8 编码的 JSON，再按这个顺序替换内容：
+Open `output-focus.html` in a browser. The sidebar lists four sections. On the overview, switch the diagram views and select a numbered citation. If the evidence entry has no external link, the source takes you to the report appendix.
 
-1. 写 `verdict` 的一句总判断和必要限制。正文 `sections` 按读者要了解的问题拆开，不用为了填模板凑章节。
-2. 在 `evidence` 登记依据和定位。在某句判断后写 `[[E1]]`（这里假设该来源的 ID 是 `E1`），让引用跟着具体句子走，不用在每节重复抄一遍材料。
-3. 需要对比才加变化图，需要筛选才加问题清单。流程、表格、折叠和术语提示的写法见[内容模型](references/content-model.md)和[图解模型](references/diagram-model.md)。
-4. 换一个新的 HTML 输出文件名生成，打开检查目录、图、来源和打印。保留 JSON，更新报告时可从同一份输入重生成。
+## What you get
 
-## 常见问题
+![Generated report showing the topic outline, conclusion, change diagram, and numbered sources](docs/images/report-preview.png)
 
-<details>
-<summary>单文件离线阅读，为什么有些链接还是打不开？</summary>
+The screenshot shows the [fictional integration proposal](examples/focus-changes.json) rendered by the report generator. The reader can compare the existing entry point with the proposed responsibilities. The Chinese status label means **pending implementation**; the example does not claim implementation or acceptance.
 
-正文、样式、脚本和已内嵌图片在 HTML 里。链接指向的原文件不一定在里面，可能需要网络、共享目录或项目权限。分享前要用接收方能访问的入口，或者写清材料名称、版本和定位。不要把凭据或不能公开的资料放进报告。
+- **For readers:** An offline HTML file containing the text, diagrams, and embedded images. Print the full report from any topic, or read the text in order with JavaScript disabled.
+- **For authors:** Keep the input JSON if you want to edit or regenerate the report. Store original material separately and link to it only where readers have access, or give a citation and location instead.
 
-</details>
+## Installation
 
-<details>
-<summary>表格或图里的结果，可以当成已验收吗？</summary>
+1. Download and extract the release ZIP. To check the download, compare the digest in `SHA256SUMS.txt` with `Get-FileHash <archive> -Algorithm SHA256` or `sha256sum <archive>`.
+2. Put the complete `evidence-html-report/` directory, including `SKILL.md`, in the Codex skills directory. Use the project's `.agents/skills/` for one project, or `~/.agents/skills/` for your user account. If you already have a working copy under `~/.codex/skills/`, update that copy.
+3. Open a new session in a project with access to the report material and select `$evidence-html-report`. The generator needs Python 3. For other hosts, start from [`SKILL.md`](SKILL.md) and verify skill discovery and execution in that host.
 
-生成器能检查字段和引用，不能替你查明事实。例如，变化图可以检查已登记的结果节点是否在对应视图可见，但不会判断两条流程是不是同一种结果，也不会证明方案已经实施。交付前仍需核对材料、状态和比较范围。
+Back up the installed directory and any custom files before upgrading. Run the quick start after upgrading. To roll back, restore the backup or install the previous ZIP. To uninstall, remove the installed Skill directory and open a new session. Keep report files and their JSON outside that directory.
 
-</details>
+## User guide
 
-<details>
-<summary>能保留旧布局，或打印整份报告吗？</summary>
+### Write a report with Codex
 
-默认点击目录切换主题。需要连续滚动时设 `readingMode: "continuous"`。无脚本时正文仍可连续阅读；使用「打印完整报告」可打印各主题和已登记的详情，不受当前选中主题限制。
+Tell Codex **who will read it, what decision they need to make, and what evidence is available**. For example:
 
-</details>
+> Use $evidence-html-report to turn this design and the local test records into an integration report for reviewers. Start with the recommendation and its biggest limit. Show what changes, then explain who owns the work and how to verify it. Distinguish local tests, pending acceptance, and planned work. Cite important claims and deliver the offline HTML with its input JSON.
 
-## 文档、验证与贡献
+Before sharing, follow one important citation to its source or appendix entry. Check for plans described as completed work or local tests presented as formal acceptance. Make sure recipients can access any linked material. If they cannot, state where to find the source and what access is required.
 
-- [Skill 写作规则](SKILL.md)和[组织与呈现原则](references/report-design.md)：适合报告作者。[内容模型](references/content-model.md)、[图解模型](references/diagram-model.md)与[原生组件模型](references/native-model.md)：适合直接编辑 JSON 的人。
-- [变更记录](CHANGELOG.md)保留各版差异和回退信息。提交公开示例请用虚构材料；漏洞按[安全说明](SECURITY.md)报告。
-- 本地验证：`python -m unittest discover -s tests -v`、`python scripts/build_report.py --self-test`。浏览器回归先按 `requirements-dev.txt` 安装依赖，再运行 `python tests/focus_browser_checks.py --output <输出目录>`（默认阅读）和 `python tests/browser_checks.py`（连续阅读）。可使用预装 Chrome，或运行 `python -m playwright install chromium`。
+### Generate and update a report from JSON
 
-## 许可证
+1. Copy an [example](examples/) and keep it in UTF-8. Use `verdict` for the main conclusion and key limits, and `sections` to organize reader questions.
+2. Register the source, location, and limits in `evidence`. If a source has the ID `E1`, write `[[E1]]` beside each claim it supports. A source can be reused across sections.
+3. Run the quick-start command with your JSON path and a new HTML filename. `--strict` rejects unrecognized fields. See the [content model](references/content-model.md) and [diagram model](references/diagram-model.md) for tables, diagrams, disclosures, and glossary hints.
 
-Apache License 2.0，见 [LICENSE](LICENSE)。
+### Common questions
+
+- **Why does a source link fail if the report is offline?** The text and embedded images travel with the HTML. External files and websites still require the right network, path, or access. Do not include secrets or material you cannot share.
+- **Does a successful build verify the conclusion?** It checks fields, references, and declared diagram outcomes. A reader still needs to verify the facts, the comparability of the diagrams, and what each source can prove.
+- **Can I scroll through the whole report or print every section?** The default view switches sections from the outline. Set `readingMode: "continuous"` for continuous scrolling. The full-report print button includes all sections and registered details, regardless of the current section.
+
+## Repository layout and verification
+
+| Path | What it contains |
+| --- | --- |
+| [`SKILL.md`](SKILL.md), [`references/`](references/) | Writing guidance and the content and diagram models |
+| [`examples/`](examples/) | Reproducible fictional report inputs |
+| [`scripts/build_report.py`](scripts/build_report.py), [`assets/`](assets/) | Local generator and offline interface assets |
+| [`tests/`](tests/) | Structure, compatibility, and browser checks |
+
+```text
+python -m unittest discover -s tests -v
+python scripts/build_report.py --self-test
+```
+
+For browser checks, install `requirements-dev.txt` and use Chrome or Playwright Chromium. Run `python tests/focus_browser_checks.py --output <directory>` for the default reader and `python tests/browser_checks.py` for the continuous reader. These checks cover generation and interaction, not whether every agent interprets a source the same way.
+
+See [Support](SUPPORT.md) for troubleshooting, [Contributing](CONTRIBUTING.md) for changes, and [Security](SECURITY.md) for vulnerabilities. This project is licensed under [Apache License 2.0](LICENSE).

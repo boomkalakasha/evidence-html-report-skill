@@ -2,7 +2,7 @@
 
 ![BOOMKALAKASHA](docs/assets/brand/watermark-auto.svg)
 
-[English](README.md) · [快速体验](#快速体验) · [安装](#安装) · [使用手册](#使用手册) · [更新记录](CHANGELOG.md) · [贡献](CONTRIBUTING.md) · [支持](SUPPORT.md) · [安全](SECURITY.md)
+[English](README.md) · [示例成品](#你会看到什么) · [快速体验](#快速体验) · [安装](#安装) · [使用手册](#使用手册) · [更新记录](CHANGELOG.md) · [贡献](CONTRIBUTING.md) · [支持](SUPPORT.md) · [安全](SECURITY.md)
 
 > **先让团队看懂结论，需要追问时，每个重要判断都有出处。**
 
@@ -15,15 +15,17 @@
 
 | 你想做什么 | Skill 怎样帮你 | 你会得到什么 |
 | --- | --- | --- |
-| 让评审决定一个接入方案 | 先讲推荐做法，再用变化图说明范围、接口和职责 | 能对照改前、变更、改后的[方案报告](examples/focus-changes.json) |
-| 复盘一次发布准备 | 按问题整理状态、影响、依据和责任 | 可以筛选并逐项展开的[核验报告](examples/audit.json) |
-| 把任务交给另一组人员 | 按主题写清现状、分工、工作顺序和验收 | 一份接手人能照着做的[交接报告](examples/reading-layout.json) |
+| 让评审决定一个接入方案 | 先讲推荐做法，再用变化图说明范围、接口和职责 | 能对照改前、变更、改后的方案报告（[输入样例](examples/focus-changes.json)） |
+| 复盘一次发布准备 | 按问题整理状态、影响、依据和责任 | 可以筛选并逐项展开的核验报告（[输入样例](examples/audit.json)） |
+| 把任务交给另一组人员 | 按主题写清现状、分工、工作顺序和验收 | 接手人能照着做的交接报告（[输入样例](examples/reading-layout.json)） |
 
 一段话或一个小表已经能讲清楚时，直接用 Markdown 就够了。这个 Skill 更适合一部分读者只看结论，另一部分读者需要核对细节的情况。
 
 ## 快速体验
 
-下载正式版 ZIP 并解压。进入含 `SKILL.md` 的 `evidence-html-report/` 目录，用 Python 3 运行下面的命令；这一步无需安装 Codex，也不需要额外的 Python 依赖。
+想先看成品，可以[下载可交互的 HTML 示例](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html)，下载后用浏览器打开。这是离线文件，当前没有托管的在线演示页。
+
+自己生成时，下载正式版 ZIP 并解压。进入含 `SKILL.md` 的 `evidence-html-report/` 目录，用 Python 3 运行下面的命令；这一步无需安装 Codex，也不需要额外的 Python 依赖。
 
 ```text
 python scripts/build_report.py --strict examples/focus-changes.json output-focus.html
@@ -33,9 +35,11 @@ python scripts/build_report.py --strict examples/focus-changes.json output-focus
 
 ## 你会看到什么
 
+[下载完整交互 HTML](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html) · [查看可编辑的 JSON 输入](examples/focus-changes.json)
+
 ![公开示例报告：主题目录、核心结论、接法变化图和来源入口](docs/images/report-preview.png)
 
-这是正式生成器用仓库中的[虚构接入方案](examples/focus-changes.json)生成的首屏。团队可以先读推荐做法，再对比原入口和新增职责。图中的「待实施」是样例状态，没有暗示改造或验收已完成。
+HTML 与截图展示的是同一份虚构接入方案，由 v1.9.0 生成器生成。打开成品后，切换左侧主题、对照「改前／变更／改后」，再沿数字角标查到附录中的依据。图中的「待实施」是样例状态，没有暗示改造或验收已完成。
 
 - **给读者：** 一份可离线打开的 HTML。图、主题说明和已内嵌的图片都在文件里。可以打印完整报告；禁用 JavaScript 时正文仍可连续阅读。
 - **给作者：** 建议同时保留输入 JSON，方便修订和重生成。原材料可单独归档，报告只保留读者有权限访问的入口或出处说明。
@@ -75,7 +79,7 @@ python scripts/build_report.py --strict examples/focus-changes.json output-focus
 | 路径 | 用途 |
 | --- | --- |
 | [`SKILL.md`](SKILL.md)、[`references/`](references/) | 写作规则、内容与图解模型 |
-| [`examples/`](examples/) | 可重跑的虚构报告输入 |
+| [`examples/`](examples/) | 可重跑的虚构输入及可下载的 HTML 成品 |
 | [`scripts/build_report.py`](scripts/build_report.py)、[`assets/`](assets/) | 本地生成器及离线界面资源 |
 | [`tests/`](tests/) | 结构、兼容和浏览器回归 |
 

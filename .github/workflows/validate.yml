@@ -20,7 +20,7 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/report-tests"
           "$RUNNER_TEMP/report-tests/bin/python" -m pip install -r requirements-dev.txt
-          "$RUNNER_TEMP/report-tests/bin/python" -m playwright install --with-deps chromium
+          google-chrome --version
       - name: 真实浏览器回归
         run: |
           "$RUNNER_TEMP/report-tests/bin/python" tests/browser_checks.py

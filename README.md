@@ -23,7 +23,7 @@ Use Markdown when a paragraph or small table is enough. This Skill is most usefu
 
 ## Quick start
 
-To read the result first, [download the interactive HTML sample](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html) and open it in a browser. This is an offline file, not a hosted demo.
+To read the result first, [download the sample ZIP](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes-demo.zip), extract it, and open `focus-changes.html` in a browser. No Python is needed to read it. This is an offline file, not a hosted demo.
 
 To generate it yourself, download and extract the release ZIP. From the `evidence-html-report/` directory containing `SKILL.md`, run this command with Python 3. You do not need Codex or extra Python packages for this example.
 
@@ -35,7 +35,7 @@ Open `output-focus.html` in a browser. The sidebar lists four sections. On the o
 
 ## What you get
 
-[Download the full interactive HTML](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html) · [View the editable JSON input](examples/focus-changes.json)
+[Download the interactive sample ZIP](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes-demo.zip) · [View the editable JSON input](examples/focus-changes.json)
 
 ![Generated report showing the topic outline, conclusion, change diagram, and numbered sources](docs/images/report-preview.png)
 

@@ -1,0 +1,6 @@
+interface:
+  display_name: "易读的证据型 HTML 报告"
+  short_description: "模块摘要与状态清单先行，小图说明变化，来源精简并可追溯"
+  default_prompt: "使用 $evidence-html-report 整理中文离线 HTML：核心按模块一句话摘要和必要状态清单组织，短目录切换主区，小业务单元图解变化，来源只列入口，完整资料归附录。"
+policy:
+  allow_implicit_invocation: true

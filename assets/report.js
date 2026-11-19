@@ -4,12 +4,14 @@ const $ = selector => document.querySelector(selector);
 const drawer = $('#drawer');
 let lastFocus = null;
 const templates = new Map([...document.querySelectorAll('template[data-finding]')].map(t => [t.dataset.finding, t]));
-document.querySelectorAll('.finding').forEach(button => button.addEventListener('click', () => {
+document.addEventListener('click', event => {
+  const button = event.target.closest?.('.finding');
+  if (!button) return;
   lastFocus = button;
   $('#drawer-body').replaceChildren(templates.get(button.dataset.id).content.cloneNode(true));
   drawer.showModal();
   $('#close').focus();
-}));
+});
 $('#close').addEventListener('click', () => drawer.close());
 drawer.addEventListener('close', () => { hideTerm(); lastFocus?.focus(); });
 
@@ -141,6 +143,7 @@ document.querySelectorAll('[data-fold-action]').forEach(button => button.addEven
   updateFoldCount();
 }));
 function revealAnchor(hash) {
+  if (data.readingMode !== 'continuous') return;
   let id;
   try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
   const target = document.getElementById(id);
@@ -150,7 +153,7 @@ function revealAnchor(hash) {
     if (parent.tagName === 'DETAILS') parent.open = true;
   }
   // Chapter navigation exposes its primary content, leaving optional deeper folds alone.
-  target.querySelector(':scope > details[data-primary]')?.setAttribute('open', '');
+  target.querySelector(':scope > details[data-primary],:scope > .section-content > details[data-primary]')?.setAttribute('open', '');
   updateFoldCount();
   requestAnimationFrame(() => { target.scrollIntoView({block:'start',behavior:'instant'}); updateReadingPosition(); });
 }
@@ -168,6 +171,7 @@ const chapters = [...document.querySelectorAll('section[data-chapter]')];
 const chapterLinks = [...document.querySelectorAll('.nav a')];
 let readingFrame = null;
 function updateReadingPosition() {
+  if (data.readingMode !== 'continuous') return;
   const line = ($('.report-navigation')?.getBoundingClientRect().height || 0) + 24;
   let current = chapters[0];
   for (const chapter of chapters) {

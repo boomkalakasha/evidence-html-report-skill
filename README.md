@@ -2,7 +2,7 @@
 
 ![BOOMKALAKASHA](docs/assets/brand/watermark-auto.svg)
 
-[简体中文](README.zh-CN.md) · [Quick start](#quick-start) · [Installation](#installation) · [User guide](#user-guide) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
+[简体中文](README.zh-CN.md) · [Sample report](#what-you-get) · [Quick start](#quick-start) · [Installation](#installation) · [User guide](#user-guide) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md) · [Security](SECURITY.md)
 
 > **Give the team the conclusion first. Give every important claim a place to check.**
 
@@ -15,15 +15,17 @@ Get the package and its checksum file from the [latest GitHub Release](https://g
 
 | If you need to… | The Skill helps you… | You get… |
 | --- | --- | --- |
-| Review an integration proposal | Lead with the recommendation, then show how the scope, interfaces, and responsibilities change | A [technical report](examples/focus-changes.json) with before, changes, and after views |
-| Review release readiness | Organize individual issues by status, impact, source, and owner | A [readiness report](examples/audit.json) with filters and expandable findings |
-| Hand work to another team | Explain the current state, who owns each step, and how to check the result | A [handoff report](examples/reading-layout.json) the receiving team can act on |
+| Review an integration proposal | Lead with the recommendation, then show how the scope, interfaces, and responsibilities change | A technical report with before, changes, and after views ([input example](examples/focus-changes.json)) |
+| Review release readiness | Organize individual issues by status, impact, source, and owner | A readiness report with filters and expandable findings ([input example](examples/audit.json)) |
+| Hand work to another team | Explain the current state, who owns each step, and how to check the result | A handoff report the receiving team can act on ([input example](examples/reading-layout.json)) |
 
 Use Markdown when a paragraph or small table is enough. This Skill is most useful when some readers only need the conclusion and others will check the details.
 
 ## Quick start
 
-Download and extract the release ZIP. From the `evidence-html-report/` directory containing `SKILL.md`, run this command with Python 3. You do not need Codex or extra Python packages for this example.
+To read the result first, [download the interactive HTML sample](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html) and open it in a browser. This is an offline file, not a hosted demo.
+
+To generate it yourself, download and extract the release ZIP. From the `evidence-html-report/` directory containing `SKILL.md`, run this command with Python 3. You do not need Codex or extra Python packages for this example.
 
 ```text
 python scripts/build_report.py --strict examples/focus-changes.json output-focus.html
@@ -33,9 +35,11 @@ Open `output-focus.html` in a browser. The sidebar lists four sections. On the o
 
 ## What you get
 
+[Download the full interactive HTML](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html) · [View the editable JSON input](examples/focus-changes.json)
+
 ![Generated report showing the topic outline, conclusion, change diagram, and numbered sources](docs/images/report-preview.png)
 
-The screenshot shows the [fictional integration proposal](examples/focus-changes.json) rendered by the report generator. The reader can compare the existing entry point with the proposed responsibilities. The Chinese status label means **pending implementation**; the example does not claim implementation or acceptance.
+The HTML and screenshot show the same fictional integration proposal, generated with v1.9.0. The sample is in Chinese: use the sidebar to change topics, select the before, changes, or after diagram view, and follow a numbered citation to its appendix entry. The status label means **pending implementation**; the example does not claim implementation or acceptance.
 
 - **For readers:** An offline HTML file containing the text, diagrams, and embedded images. Print the full report from any topic, or read the text in order with JavaScript disabled.
 - **For authors:** Keep the input JSON if you want to edit or regenerate the report. Store original material separately and link to it only where readers have access, or give a citation and location instead.
@@ -75,7 +79,7 @@ Before sharing, follow one important citation to its source or appendix entry. C
 | Path | What it contains |
 | --- | --- |
 | [`SKILL.md`](SKILL.md), [`references/`](references/) | Writing guidance and the content and diagram models |
-| [`examples/`](examples/) | Reproducible fictional report inputs |
+| [`examples/`](examples/) | Reproducible fictional inputs and the downloadable HTML sample |
 | [`scripts/build_report.py`](scripts/build_report.py), [`assets/`](assets/) | Local generator and offline interface assets |
 | [`tests/`](tests/) | Structure, compatibility, and browser checks |
 

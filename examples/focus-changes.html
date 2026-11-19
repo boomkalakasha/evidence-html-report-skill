@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>处理能力怎样并入现有服务</title><style>:root{--ink:#203147;--muted:#607086;--line:#dbe3ec;--paper:#fff;--accent:#245781;--drawer-width:760px}
+.term{color:inherit;text-decoration:underline dotted #548ebd 1.5px;text-underline-offset:4px;cursor:help}.definition{padding:16px 0;border-bottom:1px solid var(--line);scroll-margin-top:160px}.definition blockquote{margin:8px 0;padding:12px 16px;border-left:3px solid #81a7c8;background:#f2f6fa;white-space:pre-wrap;overflow-wrap:anywhere}.term-popover{max-height:calc(100dvh - 24px);overflow:hidden;overflow-wrap:anywhere}.term-popover p{margin:6px 0}.term-popover blockquote{margin:8px 0;padding-left:10px;border-left:2px solid #95b4cd;white-space:pre-wrap}.term-popover small{display:block;color:#cadcea}dialog.term-dialog{width:min(680px,96vw);height:auto;max-height:86dvh;margin:auto;border-radius:12px}.term-dialog .drawer-body{max-height:calc(86dvh - 75px)}
+*{box-sizing:border-box}html{scroll-behavior:auto;scroll-padding-top:20px}body{margin:0;background:#f3f6fa;color:var(--ink);font:16px/1.75 "Microsoft YaHei","PingFang SC","Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}a{color:var(--accent)}[hidden]{display:none!important}h1,h2,h3,p{overflow-wrap:anywhere}h2{font-size:23px;line-height:1.45;margin:0 0 12px}h3{font-size:18px;margin:0 0 8px}p{margin:8px 0 14px}small,.muted{color:var(--muted)}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,.term:focus-visible{outline:3px solid #6ea7cd;outline-offset:3px}
+.shell{max-width:1220px;padding:26px;margin:auto}.hero{padding:30px 34px;background:#17334e;color:#fff;border-radius:18px}.hero h1{font-size:clamp(28px,4vw,44px);line-height:1.3;margin:8px 0 14px}.hero p{max-width:960px;color:#d9e7f3}.report-type{font-size:14px;color:#b9d2e8}.meta{display:flex;flex-wrap:wrap;gap:8px}.meta span{font-size:13px;background:#ffffff14;padding:4px 10px;border-radius:7px;overflow-wrap:anywhere;max-width:100%}.verdict{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin:18px 0}.card,.section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;min-width:0}.blocker{border:0}.card h2{font-size:18px}.verdict-label{font-size:24px;font-weight:700;margin:4px 0 10px}.section{margin:18px 0;scroll-margin-top:20px}.section-summary{color:var(--muted)}.nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0}.nav a{text-decoration:none;padding:6px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:14px}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}.metric strong{display:block;font-size:28px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:14px}.item{border:1px solid var(--line);border-radius:10px;background:#fafcfe;padding:18px;min-width:0;overflow-wrap:anywhere}.item ul{margin:8px 0;padding-left:22px}.item-meta{font-size:14px}.checklist{counter-reset:check}.checklist .item{position:relative;padding-left:48px}.checklist .item:before{counter-increment:check;content:counter(check);position:absolute;left:16px;top:18px;font-weight:700;color:var(--accent)}
+.table-wrap{max-width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;min-width:680px}th,td{padding:13px 15px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}th{background:#edf3f8;font-size:14px}tr:last-child td{border-bottom:0}.finding{border:0;background:none;color:var(--accent);font-weight:700;text-align:left;padding:0}.badge{display:inline-block;border-radius:6px;font-size:13px;padding:2px 8px;background:#edf1f6;white-space:nowrap}.good{background:#e3f2e9;color:#286248}.warn{background:#fff0d9;color:#895713}.bad{background:#fae7e4;color:#9d3934}.pending,.badge.muted{background:#f0f2f5;color:#596579}.badge.action{background:#e7f0ff;color:#1756a9}.badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px}.tools{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tools input{min-width:180px;flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px}.tools button,.close{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}.tools button.active{background:var(--accent);color:#fff;border-color:var(--accent)}#status-buttons{display:contents}.empty{padding:18px;text-align:center}.layer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}.layer{border-top:1px solid #dbe3ec;padding:10px 14px;background:#f6f9fc}.layer strong{display:block}.layer p{font-size:14px;margin-bottom:0}
+.flow{display:flex;list-style:none;gap:0;padding:0;margin:20px 0;align-items:stretch}.flow>li{flex:1;min-width:0;display:flex;align-items:stretch}.flow-node{flex:1;padding:16px;border:1px solid #cddceb;border-radius:10px;background:#f4f8fc;min-width:0;overflow-wrap:anywhere}.flow-node strong{display:block}.flow-node p{font-size:14px;margin-bottom:0}.flow-edge{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:68px;max-width:100px;padding:0 8px;font-size:12px;color:var(--accent);overflow-wrap:anywhere}.flow-edge b{font-size:24px}.fold{border:1px solid var(--line);border-radius:10px;margin:12px 0}.fold summary{padding:13px 16px;cursor:pointer;font-weight:700}.fold-body{padding:0 18px 16px;overflow-wrap:anywhere}.fold-body ul{padding-left:22px}.evidence{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;overflow-wrap:anywhere}.evidence-meta{font-size:13px}.detail h3{margin-top:22px}.detail ul{padding-left:22px}.term{text-decoration:underline dotted #548ebd 1.5px;text-underline-offset:4px;cursor:help}.term-popover{position:fixed;z-index:10000;width:max-content;max-width:min(380px,calc(100vw - 24px));padding:12px 15px;background:#17334e;color:#fff;border-radius:10px;box-shadow:0 12px 32px #17334e33;font-size:14px;pointer-events:none}.term-popover strong{display:block;margin-bottom:4px}
+dialog{border:0;margin:0 0 0 auto;padding:0;width:min(var(--drawer-width),96vw);height:100dvh;max-height:100dvh;max-width:none;box-shadow:-18px 0 50px #172c4330}dialog::backdrop{background:#12283a66}.drawer{display:flex;flex-direction:column;height:100%;position:relative}.drawer-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.drawer-body{padding:24px;overflow:auto}.resize{position:absolute;left:0;top:62px;bottom:0;width:12px;cursor:ew-resize;touch-action:none}.resize:focus-visible{background:#d7e9f7;outline:2px solid #6ea7cd}.print-only{display:none}footer{font-size:13px;color:var(--muted);padding:20px 4px;overflow-wrap:anywhere}
+@media(max-width:760px){.shell{padding:12px}.hero{padding:24px 20px}.section,.card{padding:18px}.verdict{grid-template-columns:1fr}.section-head{flex-direction:column;gap:0}.flow{flex-direction:column}.flow>li{flex-direction:column}.flow-edge{max-width:none;min-height:46px;flex-direction:row;gap:10px;padding:6px}.flow-edge b{transform:rotate(90deg)}dialog{width:100vw}.resize{display:none}.drawer-body{padding:20px}.tools input{min-width:0;flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{size:A4;margin:15mm}body{background:#fff;font-size:10.5pt;color:#000}.shell{max-width:none;padding:0}.hero{background:#fff;color:#000;border:1px solid #bbb;padding:18px}.hero h1{font-size:23pt}.hero p,.report-type,.meta span{color:#333}.meta span{background:none;border:1px solid #ddd}.no-print,dialog,.term-popover{display:none!important}.print-only{display:block}.section{border:0;border-top:1px solid #bbb;border-radius:0;padding:16px 0}.card{padding:14px;border-radius:0}.grid,.layer-grid{display:block}.item,.layer{margin:10px 0}.table-wrap{overflow:visible;border-radius:0}table{min-width:0;width:100%;table-layout:fixed;font-size:9pt}th,td{padding:8px;overflow-wrap:anywhere}thead{display:table-header-group}tr,.item,.evidence{break-inside:avoid}h2,h3{break-after:avoid}.fold-body{display:block!important}.fold summary{list-style:none}.fold{border:0}.flow{display:block}.flow>li{display:block;margin:8px 0}.flow-edge{flex-direction:row;max-width:none;justify-content:flex-start}.flow-edge b{transform:rotate(90deg)}.print-finding{break-before:auto;border-top:1px solid #bbb;margin-top:18px;padding-top:14px}.term{text-decoration:none}#findings-section{display:none}}
+
+/* 阅读层级：保持既有交互，按内容语义改善排版。 */
+html { scroll-padding-top: 86px; }
+body { background: #f4f5f3; line-height: 1.85; }
+::selection { background: #c9e3f2; color: #162d43; }
+input { caret-color: var(--accent); }
+* { scrollbar-color: #9baebe #edf1f4; scrollbar-width: thin; }
+a { text-underline-offset: 4px; overflow-wrap: anywhere; }
+a:hover { color: #143c60; text-decoration-thickness: 2px; }
+h1,h2,h3 { text-wrap: balance; }
+p { margin: 0 0 14px; max-width: 72ch; }
+ul { margin: 8px 0 14px; padding-left: 22px; }
+li + li { margin-top: 7px; }
+.muted,small,.section-summary { color: #536578; }
+.shell { max-width: 1180px; padding: 32px; }
+.hero { padding: 12px 0 24px; background: transparent; color: var(--ink); border-radius: 0; }
+.hero h1 { font-size: clamp(28px,4vw,38px); line-height: 1.45; margin: 0 0 16px; }
+.hero > p { color: #536578; max-width: 65ch; }
+.meta { gap: 6px 18px; }
+.meta span { background: none; padding: 0; color: #536578; }
+.nav { position: sticky; top: 0; z-index: 5; gap: 4px; flex-wrap: nowrap; padding: 10px 0; background: #f4f5f3; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow-x: auto; }
+.nav a { padding: 7px 12px; border: 0; background: transparent; border-radius: 5px; white-space: nowrap; }
+.nav a:hover { background: #e3ebf1; }
+.js-only { display: none; }
+.js-enabled .reading-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px 16px; padding: 12px 0 0; font-size: 13px; color: #536578; }
+.reading-tools button { font-size: 13px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--accent); }
+.verdict { grid-template-columns: minmax(0,2.2fr) minmax(0,1fr); gap: 28px; padding: 26px 28px; margin: 20px 0 32px; background: #eaf1f5; border: 1px solid #cbdce7; border-radius: 10px; }
+.verdict .card { background: transparent; border: 0; border-radius: 0; padding: 0; }
+.verdict .blocker { border-left: 1px solid #bfcfdc; padding-left: 24px; }
+.card h2 { font-size: 15px; color: #3c566e; margin-bottom: 10px; }
+.verdict-label { font-size: 25px; line-height: 1.6; margin: 0 0 14px; }
+.verdict p,.verdict li { font-size: 15px; }
+.links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 14px; }
+.links li + li { margin-top: 0; }
+.section { padding: 28px; margin: 24px 0; border-radius: 10px; scroll-margin-top: 80px; }
+h2 { font-size: 24px; line-height: 1.5; margin-bottom: 14px; }
+h3 { line-height: 1.6; margin-bottom: 10px; }
+.grid { grid-template-columns: repeat(auto-fit,minmax(min(100%,320px),1fr)); gap: 22px 28px; margin-top: 20px; }
+.item { background: transparent; border: 0; border-radius: 0; padding: 0; }
+.item-meta { color: #536578; }
+.item-meta strong { color: var(--ink); }
+.checklist { display: block; }
+.checklist .item { padding: 0 0 20px 44px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+.checklist .item:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.checklist .item:before { left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; text-align: center; background: #eaf1f6; }
+.table-wrap { margin-top: 14px; border-radius: 6px; }
+table { font-variant-numeric: tabular-nums; }
+th,td { padding: 14px 16px; }
+td { font-size: 15px; line-height: 1.8; }
+td p { margin-bottom: 8px; }
+td > :last-child { margin-bottom: 0; }
+td:first-child { font-weight: 600; }
+td ul { padding-left: 18px; }
+.tools button:hover,.close:hover,.reading-tools button:hover { background: #edf3f7; }
+.tools button.active:hover { background: var(--accent); }
+.layer-grid { gap: 20px; }
+.layer { border: 0; border-top: 1px solid var(--line); padding: 14px 0 0; background: transparent; }
+.layer strong { margin-bottom: 8px; }
+.layer p { margin-top: 10px; }
+.flow { margin: 24px 0; }
+.flow > li { margin-top: 0; }
+.flow-node { border-radius: 6px; }
+.flow-node p { margin-top: 8px; }
+.comparison { margin: 22px 0 0; }
+.compare-lanes { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,210px),1fr)); gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.compare-lanes .item { padding: 20px; background: #f5f8fa; border-right: 1px solid var(--line); }
+.compare-lanes .item:last-child { border: 0; background: #eef5f1; }
+.compare-lanes .item:nth-child(2) { background: #fbf7ee; }
+.compare-lanes .item p,.compare-lanes .item li { font-size: 14px; }
+.merge-arrow { display: block; margin: 12px auto; color: var(--accent); }
+.compare-outcome { text-align: center; padding: 14px 20px; background: #eaf1f6; font-weight: 600; border-radius: 6px; }
+.fold { border: 0; border-top: 1px solid var(--line); border-radius: 0; margin: 22px 0 0; }
+.fold summary { padding: 15px 0; font-weight: 600; color: var(--accent); }
+.fold summary:hover { color: #143c60; }
+.fold[open] > summary { margin-bottom: 8px; }
+.fold-body { padding: 0 0 10px; }
+.fold-body .grid { margin-top: 8px; }
+.fold-body .fold { margin-left: 12px; }
+.report-navigation { position: sticky; top: 0; z-index: 5; background: #f4f5f3; }
+.report-navigation .nav { position: static; }
+.js-enabled .reading-position { display: block; padding: 6px 12px 2px; font-size: 12px; color: #536578; }
+.nav a[aria-current] { background: #dce9f2; color: #143c60; }
+.outline-number { color: #537b99; font-variant-numeric: tabular-nums; font-size: .8em; margin-right: .45em; }
+.report-outline { margin: 14px 0 0; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.report-outline summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.report-outline ul { list-style: none; padding: 8px 0 0; margin: 0; columns: 2; column-gap: 36px; }
+.report-outline li { break-inside: avoid; margin: 0 0 6px; line-height: 1.6; }
+.report-outline a { display: inline-block; padding: 3px 0; }
+.report-outline .outline-depth-1 { padding-left: 22px; font-size: 14px; }
+.report-outline .outline-depth-2 { padding-left: 42px; font-size: 13px; }
+.evidence-refs { font-size: 13px; color: #536578; margin: 10px 0; line-height: 1.8; }
+.evidence-table td:first-child { width: 38%; font-weight: 400; }
+.evidence-table td:first-child > strong { display: block; color: var(--accent); margin-bottom: 6px; }
+.evidence-table tr:target { background: #eef5fa; outline: 2px solid #86abc5; outline-offset: -2px; }
+.evidence-table tr,.fold { scroll-margin-top: 116px; }
+.verdict .blocker h3 { font-size: 15px; color: #3c566e; }
+@media(max-width:760px) {
+  .report-outline ul { columns: 1; }
+  .evidence-table td:first-child { width: auto; }
+  .shell { padding: 16px; }
+  .hero { padding: 10px 0 20px; }
+  .section { padding: 20px; }
+  .verdict { grid-template-columns: 1fr; padding: 20px; gap: 18px; }
+  .verdict .blocker { border-left: 0; border-top: 1px solid #bfcfdc; padding-left: 0; padding-top: 18px; }
+  .verdict-label { font-size: 22px; }
+  .grid { grid-template-columns: 1fr; gap: 20px; }
+  .grid .item + .item { padding-top: 20px; border-top: 1px solid var(--line); }
+  .compare-lanes { grid-template-columns: 1fr; }
+  .compare-lanes .item { border-right: 0; border-bottom: 1px solid var(--line); }
+  .content-table { min-width: 0; }
+  .content-table thead { display: none; }
+  .content-table tbody,.content-table tr,.content-table td { display: block; }
+  .content-table tr { padding: 14px; border-bottom: 1px solid var(--line); }
+  .content-table tr:last-child { border: 0; }
+  .content-table td { padding: 6px 0; border: 0; }
+  .content-table td::before { content: attr(data-label); display: block; color: #536578; font-size: 12px; font-weight: 400; }
+}
+@media print {
+  .outline-number { color: #000; }
+  .hero { padding: 0 0 16px; }
+  .hero h1 { font-size: 23pt; }
+  .verdict { display: block; background: #fff; border: 1px solid #bbb; margin: 16px 0; }
+  .verdict .blocker { border: 0; padding: 12px 0 0; }
+  .section { margin: 16px 0; border-radius: 0; }
+  td,th { font-size: 9pt; padding: 8px; }
+  .content-table { display: table; }
+  .content-table thead { display: table-header-group; }
+  .content-table tbody { display: table-row-group; }
+  .content-table tr { display: table-row; padding: 0; }
+  .content-table td { display: table-cell; padding: 8px; border-bottom: 1px solid var(--line); }
+  .content-table td::before { display: none; }
+  details::details-content { content-visibility: visible; }
+  .fold summary { color: #000; }
+  .compare-lanes { display: block; }
+  .compare-lanes .item { border: 0; background: #fff; padding: 10px; }
+  .compare-outcome { background: #fff; border-top: 1px solid #bbb; }
+  .layer { background: #fff; }
+}
+.term-preview-explanation,.term-preview-quote{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}.term-popover .term-preview-quote{max-height:7em}.term-popover{max-height:min(560px,calc(100dvh - 24px))}
+.term-popover .term-preview-title,.term-preview-source,.term-preview-scope{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.term-popover .term-preview-title{-webkit-line-clamp:2}
+
+:root{--sidebar-width:252px;--ink:#182230;--muted:#667085;--line:#e4e7ec;--accent:#175cd3}
+body{background:#f8fafc;line-height:1.75}body:has(dialog[open]){overflow:hidden}
+.shell{width:calc(100% - var(--sidebar-width));max-width:1240px;margin:0 auto 0 var(--sidebar-width);padding:24px 30px}
+.hero{padding:0;background:transparent}.hero h1{font-size:clamp(23px,2.7vw,34px);margin:0 0 16px}
+.verdict{margin:0 0 16px;padding:24px;background:#eff6ff;gap:24px}.verdict.single{grid-template-columns:1fr}.verdict-label{font-size:23px}.reader-answer{margin:10px 0 0}.reader-answer strong{color:#17334e}.report-meta{margin:18px 0 22px}.meta{font-size:13px}
+#report-outline{position:fixed;inset:16px auto 16px 12px;width:calc(var(--sidebar-width) - 24px);margin:0;padding:18px 14px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff;z-index:10;box-shadow:0 2px 8px #10182808}
+#report-outline>strong{font-size:17px}#report-outline>p{font-size:12px;color:var(--muted);margin:8px 0}#report-outline .reading-position{font-size:12px;padding:8px 0}
+#report-outline .nav{display:block;position:static;overflow:visible;border:0;padding:0;background:transparent}
+#report-outline .nav ul{list-style:none;padding:0;margin:0;columns:1;display:block}#report-outline .nav li{margin:0}#report-outline .nav a{display:block;padding:8px 5px;border:0;white-space:normal;line-height:1.55;font-size:13px;border-radius:6px;color:#344054}
+#report-outline a[aria-current]{background:#eff6ff;color:#175cd3}#report-outline .outline-depth-1{padding-left:12px}#report-outline .outline-depth-2{padding-left:22px}
+.js-enabled .js-only{display:inline-block}.js-enabled .view-controls{display:flex;gap:8px;align-items:center;margin:14px 0}.view-controls button,.reader-dialog-head button,.report-figure button,.scenario-explorer button{padding:7px 12px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font:inherit}
+.view-controls [aria-pressed=true]{background:#175cd3;color:white}.js-enabled body[data-view=brief] .shell>[data-detail-only]>.section-content{display:none}
+.reader-dialog-head{display:flex;position:sticky;top:0;gap:10px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line);background:white;z-index:3}.reader-dialog-head strong{flex:1;overflow-wrap:anywhere}.reader-dialog-body{padding:22px;overflow-wrap:anywhere}
+dialog.chapter-dialog,dialog.component-dialog{width:min(1080px,calc(100vw - 32px));height:auto;max-height:90dvh;margin:auto;border:1px solid var(--line);border-radius:14px;overflow:auto}
+.reader-dialog-body .section,.reader-dialog-body .verdict{margin:0;border:0}.reader-dialog-body .section-content{display:block!important}.reader-dialog-body .print-only{display:none}
+.report-figure{margin:20px 0;padding:14px;border:1px solid var(--line);border-radius:10px;background:white;break-inside:avoid}.report-figure img{max-width:100%;max-height:560px;object-fit:contain;display:block;margin:auto;cursor:zoom-in}.report-figure figcaption{margin:10px 0;color:var(--muted);font-size:14px}
+.diagram-scroll{overflow:auto;max-width:100%}.diagram-scroll svg{display:block;width:100%;min-width:760px;max-height:none}.diagram-scroll [data-component]{cursor:pointer}.diagram-scroll [data-component]:focus rect,.diagram-scroll [data-component].executing rect{stroke:#175cd3;stroke-width:4}.node-index{border-top:1px solid var(--line);padding:12px 0}.node-index .item{margin:14px 0;padding:14px;border-left:3px solid #d0d5dd}.node-index summary{cursor:pointer}
+.scenario-explorer select{font:inherit;max-width:100%;padding:7px;margin:0 8px;border:1px solid var(--line);border-radius:6px}.scenario-explorer>article{margin:20px 0}.scenario-state{padding:8px 12px;background:#f2f4f7;border-left:3px solid #98a2b3}.trace-list [aria-current=step]{background:#eff6ff;color:#175cd3}.trace-state{padding:8px;font-size:14px}
+dialog.figure-dialog{width:calc(100vw - 24px);height:calc(100dvh - 24px);margin:auto;border-radius:10px;overflow:hidden;background:#fff}.figure-stage{height:calc(100% - 75px);overflow:auto;text-align:center;padding:14px}.figure-stage img{display:block;margin:auto;max-width:none;cursor:zoom-out}
+/* Restrained emphasis: color supplements weight, background, and literal code styling. */
+.text-emphasis{font-weight:700;color:#175cd3}.text-highlight{font-weight:600;color:#533b03;background:#fff1b8;padding:.04em .16em;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}.inline-code{font-family:Consolas,"Cascadia Mono",monospace;font-size:.92em;color:#344054;background:#f2f4f7;border:1px solid #e4e7ec;border-radius:4px;padding:.08em .25em;white-space:pre-wrap;overflow-wrap:anywhere}
+@media print{.text-emphasis{color:#000;font-weight:700}.text-highlight{color:#000;background:none;border-bottom:1px solid #555}.inline-code{color:#111;background:none;border-color:#aaa}}
+@media(max-width:850px){:root{--sidebar-width:172px}.shell{padding:18px 14px}.verdict{grid-template-columns:1fr;padding:18px}.verdict .blocker{padding:14px 0 0;border-left:0;border-top:1px solid #cbd5e1}}
+@media(max-width:520px){:root{--sidebar-width:118px}#report-outline{inset:8px auto 8px 6px;width:calc(var(--sidebar-width) - 12px);padding:12px 7px}#report-outline>strong{font-size:14px}#report-outline>p{font-size:11px}#report-outline .nav a{font-size:12px;padding:8px 2px}#report-outline .outline-depth-1{padding-left:5px}#report-outline .outline-depth-2{padding-left:9px}.shell{padding:12px 9px;font-size:15px}.hero h1{font-size:20px}.section,.card{padding:14px}.section h2{font-size:19px}.verdict{padding:14px}.verdict-label{font-size:20px}.verdict p{font-size:14px}.reader-dialog-head{padding:10px;flex-wrap:wrap}.reader-dialog-body{padding:12px}.grid{grid-template-columns:1fr}.meta{display:block}.meta span{display:block;margin:5px 0}.view-controls{flex-wrap:wrap}dialog.chapter-dialog,dialog.component-dialog{width:calc(100vw - 16px);max-height:94dvh}.reader-dialog-body .verdict{padding:10px}.diagram-scroll svg{min-width:760px}}
+@media print{.js-only,#report-outline,.view-controls,.reading-tools{display:none!important}.shell{width:100%;max-width:none;margin:0;padding:0}.hero h1{font-size:21pt}.report-meta{font-size:9pt}.verdict{display:block;background:white;padding:12px}.verdict .blocker{border:0;padding:10px 0}.js-enabled body[data-view=brief] .shell>[data-detail-only]>.section-content{display:block!important}.scenario-explorer>article[hidden]{display:block!important}.diagram-scroll{overflow:visible}.diagram-scroll svg{width:100%;min-width:0}.report-figure img{max-height:160mm}.node-index>*,.node-index[open]>*{display:block}dialog{display:none!important}.report-figure button,.scenario-explorer select,.trace-state{display:none!important}}
+
+/* A chapter is a complete reading surface. Hiding requires JS; printing reverses it. */
+:root{--focus-nav-height:0px}
+html:has(body[data-reading-mode=focus]){scroll-padding-top:0}
+.section-subtitle{margin:-2px 0 18px;font-size:15px;color:#667085;font-weight:400}
+.heading-note{display:inline-flex;vertical-align:middle;margin-left:9px;font-weight:400;line-height:1}
+.nav-note{flex:none;margin:0 7px 0 2px}
+.heading-help{width:18px;height:18px;padding:0;border:1px solid #d0d5dd;border-radius:50%;background:transparent;color:#98a2b3;font:12px/16px sans-serif;cursor:help}
+.heading-tooltip{display:none;position:fixed;z-index:1000;width:max-content;max-width:min(320px,calc(100vw - 24px));margin:0;padding:9px 12px;border:1px solid #e4e7ec;border-radius:7px;background:#fff;box-shadow:0 4px 16px #10182818;font-size:13px;line-height:1.6;text-align:left;color:#475467;letter-spacing:0}
+.heading-note:not(.is-dismissed):hover .heading-tooltip,.heading-note:not(.is-dismissed):focus-within .heading-tooltip,.heading-note.is-open .heading-tooltip{display:block}
+.overview-list{grid-column:1/-1}
+.overview-topics{list-style:none;padding:0;margin:16px 0 18px;display:grid;gap:10px}
+.overview-topics>li{display:grid;grid-template-columns:3em minmax(0,1fr);gap:12px;margin:0;line-height:1.65;font-size:15px}.overview-topics>li>strong{font-weight:600}.overview-topics a{text-decoration:none}.overview-topics a:hover{text-decoration:underline}
+.overview-progress{margin:16px 0;padding:12px 0;border-top:1px solid #eaecf0;border-bottom:1px solid #eaecf0}.overview-progress h3{font-size:12px;font-weight:500;color:#98a2b3;margin:0 0 9px}.overview-progress>ul{list-style:none;padding:0;margin:0;display:grid;gap:8px}.overview-progress li{display:flex;align-items:baseline;gap:10px;font-size:13px;line-height:1.65;margin:0}.overview-progress .badge{font-size:11px;min-width:64px;text-align:center;flex:none}.overview-progress li>span:last-child{min-width:0}.overview-progress strong{font-weight:600}
+.evidence-refs{display:inline;position:relative;vertical-align:super;font-size:.68em;line-height:0;white-space:nowrap;margin-left:.18em}
+.evidence-ref{text-decoration:none;color:#175cd3;font-weight:600;padding:.1em .08em}
+.evidence-ref:hover,.evidence-ref:focus-visible{text-decoration:underline;outline-offset:3px}
+.citation-popover{position:fixed;z-index:1000;max-width:min(380px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:hidden;padding:12px 15px;border:1px solid #d0d5dd;border-radius:9px;background:#fff;box-shadow:0 8px 28px #10182824;color:#182230;line-height:1.6;font-size:13px;overflow-wrap:anywhere;pointer-events:none}
+.citation-popover p{margin:5px 0 0}.citation-popover small{display:block;color:#667085;margin-top:5px}
+.section-sources{margin-top:20px;padding-top:11px;border-top:1px solid #eaecf0;font-size:12px;line-height:1.5;color:#667085}
+.section-sources h3{font-size:11px;font-weight:500;color:#98a2b3;margin:0 0 6px}.section-sources ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));column-gap:28px;row-gap:3px;padding-left:22px;margin:0}.section-sources li{padding-left:2px;margin:0 0 3px;scroll-margin-top:calc(var(--focus-nav-height) + 20px)}
+.section-sources li::marker{font-size:12px;color:#667085}.source-title{overflow-wrap:anywhere}.section-sources p{font-size:13px;margin:3px 0}.section-sources .source-meta{font-size:12px;color:#667085}.section-sources li:target{background:#eff6ff;outline:3px solid #eff6ff;border-radius:3px}.source-title a{text-decoration-thickness:1px;text-underline-offset:3px}
+.print-report{font:inherit;font-size:12px;border:1px solid #d0d5dd;border-radius:6px;background:white;padding:6px 10px;color:#475467;cursor:pointer}
+body[data-reading-mode=focus]{--sidebar-width:232px;background:#f7f9fc;color:#182230}
+body[data-reading-mode=focus] .shell{max-width:1224px;padding:24px 36px 32px}
+body[data-reading-mode=focus] .hero h1{font-size:16px;line-height:1.5;font-weight:500;color:#667085;margin:0 0 18px;letter-spacing:0}
+body[data-reading-mode=focus] .section{padding:24px 28px;margin:0;border-radius:12px;box-shadow:0 1px 3px #10182805}
+body[data-reading-mode=focus] .section h2{position:relative;font-size:26px;line-height:1.4;margin:0 0 10px;outline-offset:5px}
+body[data-reading-mode=focus] .outline-number{font-size:.64em;margin-right:7px;font-weight:500;color:#98a2b3}
+body[data-reading-mode=focus] .verdict-label{font-size:23px;line-height:1.5;font-weight:700;letter-spacing:-.02em;margin:15px 0 8px;color:#17334e}
+body[data-reading-mode=focus] .section p{max-width:76ch}.section-summary:empty,.section-content:empty{display:none}
+body[data-reading-mode=focus] .section-summary{font-size:17px;color:#344054;margin:6px 0 20px}
+body[data-reading-mode=focus] .overview>p:not(.verdict-label){font-size:17px}
+body[data-reading-mode=focus] .decision-limit{border-left:3px solid #e8b950;background:#fffbeb;padding:10px 14px;font-size:14px!important;max-width:none}
+body[data-reading-mode=focus] .scope-note{font-size:12px;color:#667085;margin-top:20px}.scope-note>summary{cursor:pointer}.scope-note .report-meta{margin:8px 0}.scope-note .report-meta p{font-size:13px}.scope-note .meta{font-size:12px;gap:8px}
+body[data-reading-mode=focus] #report-outline{inset:20px auto 20px 16px;width:200px;padding:18px 13px;display:flex;flex-direction:column;gap:13px}
+.outline-header h1{font-size:16px;line-height:1.45;color:#344054;margin:0 7px 8px;font-weight:650}.outline-header p{font-size:11px;color:#98a2b3;margin:0 7px}
+.nav-highlights{display:grid;gap:12px;margin-top:8px;padding:14px 8px 0;border-top:1px solid #eaecf0}
+.nav-highlights h2{font-size:11px;line-height:1.4;color:#98a2b3;font-weight:500;margin:0}
+.nav-highlights>a{display:block;text-decoration:none;color:#344054}.nav-highlights small{display:block;font-size:10px;color:#98a2b3;margin:0 0 3px}.nav-highlights strong{display:block;font-size:13px;line-height:1.6;font-weight:600}.nav-highlights>a:hover strong{color:#175cd3}
+body[data-reading-mode=focus] #report-outline>strong{font-size:13px;color:#667085;font-weight:500;padding:0 8px}
+body[data-reading-mode=focus] #report-outline .nav{flex:0 1 auto;min-height:0;overflow:auto}
+body[data-reading-mode=focus] #report-outline .nav ul{display:flex;flex-direction:column;gap:5px}
+body[data-reading-mode=focus] #report-outline .nav li{display:flex;align-items:center;min-width:0}
+body[data-reading-mode=focus] #report-outline .nav a{display:flex;flex:1;min-width:0;align-items:baseline;gap:5px;font-size:15px;line-height:1.45;padding:9px;border-radius:8px}
+body[data-reading-mode=focus] #report-outline .nav .outline-number{flex:none;font-size:11px;min-width:12px;margin:0}
+body[data-reading-mode=focus] #report-outline .nav a[aria-current]{font-weight:650}
+body[data-reading-mode=focus] #report-outline .reading-position{margin-top:auto;border-top:1px solid #eaecf0;padding:12px 8px 0;font-size:11px;color:#667085}
+body[data-reading-mode=focus] #report-outline .print-report{align-self:flex-start;margin-left:6px}
+.focus-ready body[data-reading-mode=focus] .shell>[data-chapter]:not(.is-active){display:none}
+body[data-reading-mode=focus] [data-chapter]{scroll-margin-top:calc(var(--focus-nav-height) + 12px)}
+body[data-reading-mode=focus] .content-table td{padding:13px 15px}body[data-reading-mode=focus] .content-table th{padding:11px 15px;font-size:14px}
+body[data-reading-mode=focus] .grid{gap:14px}body[data-reading-mode=focus] footer{font-size:11px;line-height:1.6;color:#98a2b3;padding-top:18px;margin-top:0}
+@media(max-height:720px) and (min-width:761px){body[data-reading-mode=focus] #report-outline{gap:9px;padding-top:15px}.outline-header h1{font-size:15px}.nav-highlights{gap:9px;padding-top:10px;margin-top:4px}body[data-reading-mode=focus] #report-outline .nav a{padding:6px 9px}}
+@media(max-width:1000px) and (min-width:761px){body[data-reading-mode=focus]{--sidebar-width:188px}body[data-reading-mode=focus] #report-outline{width:160px;left:12px;padding:18px 10px}body[data-reading-mode=focus] .shell{padding:22px}body[data-reading-mode=focus] .section{padding:24px}}
+@media(max-width:760px){
+ html:not(.focus-ready) body[data-reading-mode=focus] #report-outline{position:static}
+ body[data-reading-mode=focus]{--sidebar-width:0px}
+ body[data-reading-mode=focus] #report-outline{position:sticky;inset:0 auto auto;width:100%;padding:10px 12px;border:0;border-bottom:1px solid #e4e7ec;border-radius:0;gap:5px;z-index:10;box-shadow:0 2px 8px #10182808;overflow:visible}
+ body[data-reading-mode=focus] #report-outline>strong{font-size:10px;padding:0 4px}
+ .outline-header h1{font-size:12px;font-weight:500;margin:0 4px 3px}.outline-header p,.nav-highlights{display:none}
+ body[data-reading-mode=focus] #report-outline .nav{overflow:visible}
+ body[data-reading-mode=focus] #report-outline .nav ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+ body[data-reading-mode=focus] #report-outline .nav a{font-size:13px;padding:7px 5px;line-height:1.35;gap:3px;height:100%}
+ body[data-reading-mode=focus] #report-outline .nav .outline-number{font-size:10px;min-width:10px}
+ body[data-reading-mode=focus] #report-outline .reading-position,body[data-reading-mode=focus] #report-outline .print-report{display:none}
+ body[data-reading-mode=focus] .shell{width:100%;margin:0;padding:16px 12px 24px;font-size:15px}
+ body[data-reading-mode=focus] .hero h1{font-size:12px;margin-bottom:12px}
+ body[data-reading-mode=focus] .section{padding:20px 16px;border-radius:10px}
+ body[data-reading-mode=focus] .section h2{font-size:23px}body[data-reading-mode=focus] .verdict-label{font-size:22px;margin-top:18px}
+ body[data-reading-mode=focus] .section-summary,body[data-reading-mode=focus] .overview>p:not(.verdict-label){font-size:15px}
+ body[data-reading-mode=focus] .section-subtitle{font-size:13px;margin-bottom:15px}
+ .heading-help{width:26px;height:26px;line-height:24px}
+ .nav-note{margin:0 2px}.nav-note .heading-help{width:24px;height:28px;line-height:24px}
+ body[data-reading-mode=focus] .grid{grid-template-columns:1fr}
+ .overview-topics>li{font-size:14px;gap:8px}.overview-progress li{font-size:12px;gap:8px}
+}
+@media print{
+ body[data-reading-mode=focus]{background:#fff;color:#000}
+ .focus-ready body[data-reading-mode=focus] .shell>[data-chapter]{display:block!important}
+ body[data-reading-mode=focus] .shell{width:100%;max-width:none;margin:0;padding:0}
+ body[data-reading-mode=focus] .hero h1{font-size:12pt;color:#333}
+ body[data-reading-mode=focus] .section{border:0;box-shadow:none;padding:12px 0;margin:0 0 18px;border-radius:0}
+ body[data-reading-mode=focus] .section h2{font-size:19pt}.section-subtitle{font-size:11pt}
+ .heading-help,.heading-note{display:none}.nav-subtitle{font-size:10pt;line-height:1.5}
+ body[data-reading-mode=focus] .verdict-label{font-size:17pt}.section-sources{break-inside:auto}.section-sources li{break-inside:avoid}
+ .citation-popover,.print-report{display:none!important}.section-sources p,.section-sources .source-meta{font-size:9pt}
+ .evidence-ref{color:#111}.section-sources li:target{outline:0;background:none}
+ .definition{break-inside:avoid-page}
+}
+
+/* Three views share one model; only screen enhancement selects a single scene. */
+.change-diagram{margin:14px 0;padding:6px 0;border:0;background:transparent;min-width:0;break-inside:avoid-page}
+.change-diagram-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.change-diagram-header>strong{font-size:14px;color:#344054;font-weight:600}.diagram-change-key{font-size:11px;color:#667085;margin-left:auto}
+.diagram-state-controls{display:none;gap:2px;border:1px solid #d0d5dd;padding:3px;border-radius:8px;background:#f8fafc}.diagrams-ready .diagram-state-controls{display:inline-flex}
+.diagram-state-controls button{border:0;border-radius:4px;padding:3px 8px;background:transparent;color:#667085;font:inherit;font-size:12px;cursor:pointer}.diagram-state-controls button[aria-pressed=true]{background:#e8f0ff;color:#175cd3;font-weight:600}.diagram-state-controls button:focus-visible,.change-diagram-canvas:focus-visible{outline:2px solid #175cd3;outline-offset:3px}
+.change-diagram .diagram-note{margin:4px 0 0;font-size:12px;color:#667085}.diagram-scroll-hint{display:none;font-size:11px;color:#98a2b3;margin:4px 0 0}.diagram-has-overflow .diagram-scroll-hint{display:block}
+.diagram-scene{margin:12px 0 0;min-width:0}.diagram-scene h4{margin:8px 0;font-size:14px;color:#667085}.diagrams-ready .diagram-scene:not(.is-selected){display:none}.diagrams-ready .diagram-scene.is-selected h4{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.change-diagram-canvas{width:100%;overflow:auto;overscroll-behavior-inline:contain;scrollbar-gutter:stable}.change-diagram-canvas>svg{display:block;width:100%;min-width:var(--diagram-width);height:auto;max-width:var(--diagram-width);margin:auto;font:13px "Segoe UI","Microsoft YaHei",sans-serif}
+.change-diagram-group rect{fill:#f8fafc;stroke:#cbd5e1;stroke-width:1;stroke-dasharray:5 4}.change-diagram-group text{fill:#667085;font-size:12px}
+.change-diagram-node>rect,.change-diagram-node>polygon,.change-diagram-node>path,.change-diagram-node>ellipse{fill:#fff;stroke:#64748b;stroke-width:1.4}.change-diagram-node>text{fill:#344054}.change-diagram-node .store-top{fill:#f8fafc}
+.change-diagram-node.state-added>rect,.change-diagram-node.state-added>polygon,.change-diagram-node.state-added>path,.change-diagram-node.state-added>ellipse{fill:#f0fdf4;stroke:#15803d}.change-diagram-node.state-removed>rect,.change-diagram-node.state-removed>polygon,.change-diagram-node.state-removed>path,.change-diagram-node.state-removed>ellipse{fill:#fff5f4;stroke:#b42318;stroke-dasharray:6 3}.change-diagram-node.state-modified>rect,.change-diagram-node.state-modified>polygon,.change-diagram-node.state-modified>path,.change-diagram-node.state-modified>ellipse{fill:#fffbeb;stroke:#b45309;stroke-width:2}
+.node-change-badge rect{fill:#fff;stroke:currentColor;stroke-width:1}.node-change-badge text{font-size:11px;fill:currentColor}.state-added{color:#15803d}.state-removed{color:#b42318}.state-modified{color:#b45309}.state-unchanged{color:#64748b}
+.change-diagram-edge>path{fill:none;stroke:currentColor;stroke-width:1.5}.change-diagram-edge.edge-dashed>path{stroke-dasharray:5 4}.change-diagram-edge.state-removed>path{stroke-dasharray:6 3}.change-diagram-edge>text{font-size:12px;fill:currentColor}.change-diagram-edge .edge-label-bg{fill:#fff;stroke:none;opacity:.96}
+.change-diagram-legend{margin:4px 0 0;padding:0;border:0;font-size:11px;color:#98a2b3}.change-diagram-legend>summary{font-size:11px;font-weight:400;cursor:pointer;width:fit-content}.change-diagram-legend>div{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:7px;color:#667085}.change-diagram-legend span{display:inline-flex;align-items:center;gap:4px}.change-diagram-legend svg{fill:#fff;stroke:#64748b;stroke-width:1.2;flex:none}.change-diagram-legend .state-key{font-weight:600}.change-diagram-legend .legend-group{fill:#f8fafc;stroke-dasharray:3 2}
+.diagram-modifications{font-size:13px;color:#475467;margin:12px 0 0;padding-left:20px}.diagram-references{font-size:12px;color:#667085;margin-top:10px}.diagram-references>span{margin-right:5px}
+@media(max-width:520px){.change-diagram{padding:4px 0;margin:12px 0}.change-diagram-header{gap:6px}.change-diagram-header>strong{font-size:13px}.diagram-change-key{display:none}.diagram-state-controls{margin-left:auto}.diagram-state-controls button{padding:5px 8px}.change-diagram-legend>div{gap:5px 10px}.change-diagram-canvas{scrollbar-gutter:auto}}
+@media print{.change-diagram{border:1px solid #aaa;padding:10px;break-inside:auto;background:#fff}.change-diagram-header{break-after:avoid}.diagram-state-controls,.diagram-scroll-hint{display:none!important}.diagrams-ready .diagram-scene:not(.is-selected),.diagram-scene{display:block!important}.diagrams-ready .diagram-scene.is-selected h4{position:static;width:auto;height:auto;overflow:visible;clip-path:none}.diagram-scene{break-inside:avoid-page}.change-diagram-canvas{overflow:visible}.change-diagram-canvas>svg{min-width:0;width:100%;height:auto}.change-diagram-legend{break-inside:avoid}.change-diagram-node,.change-diagram-edge,.change-diagram-legend{-webkit-print-color-adjust:exact;print-color-adjust:exact}.diagram-modifications{break-inside:avoid}}
+@media print{.change-diagram-legend::details-content{content-visibility:visible;display:block}.change-diagram-legend>div{display:flex!important}.diagram-change-key{font-size:9pt}.change-diagram-legend{color:#555}.change-diagram{border:0;padding:4px 0}.change-diagram-canvas>svg{max-width:var(--diagram-width)}}
+</style></head><body data-reading-mode="focus">
+<aside class="report-outline no-print" id="report-outline"><header class="outline-header"><h1>处理能力怎样并入现有服务</h1><p>阅读提纲</p></header><nav class="nav" aria-label="报告内容"><ul><li class="outline-depth-0"><a href="#overview"><span class="outline-number">1</span> <span>核心结论</span></a></li><li class="outline-depth-0"><a href="#checks"><span class="outline-number">2</span> <span>验收</span></a><span class="heading-note nav-note"><button type="button" class="heading-help" aria-label="验收：怎样确认结果可信？" aria-describedby="checks-nav-subtitle" aria-expanded="false" title="怎样确认结果可信？">?</button><span class="section-subtitle heading-tooltip" id="checks-nav-subtitle" role="tooltip">怎样确认结果可信？</span></span></li><li class="outline-depth-0"><a href="#bounds"><span class="outline-number">3</span> <span>边界</span></a><span class="heading-note nav-note"><button type="button" class="heading-help" aria-label="边界：哪些内容仍需补齐？" aria-describedby="bounds-nav-subtitle" aria-expanded="false" title="哪些内容仍需补齐？">?</button><span class="section-subtitle heading-tooltip" id="bounds-nav-subtitle" role="tooltip">哪些内容仍需补齐？</span></span></li><li class="outline-depth-0"><a href="#appendix"><span class="outline-number">4</span> <span>附录</span></a></li></ul></nav><section class="nav-highlights" aria-label="全局重点"><h2>重点</h2><a href="#checks"><small>先验什么</small><strong>成功、拒绝、重复请求</strong></a><a href="#bounds"><small>范围</small><strong>虚构方案，尚待实施</strong></a></section><div class="reading-position js-only" id="reading-position" role="status">1 / 4 · 核心结论</div><button class="print-report js-only" data-print-report>打印完整报告</button></aside><main class="shell" id="report-main"><header class="hero print-only"><h1>处理能力怎样并入现有服务</h1></header><section class="section overview" id="overview" data-chapter="1"><h2 tabindex="-1"><span class="outline-number">1</span> 核心结论</h2><p class="verdict-label">沿用原入口，在同一进程补上处理能力</p><p>原页面继续使用，新增处理<a class="term" data-glossary="0" title="软件开发工具包：这里指供原服务直接调用的能力包。" href="#term-detail-1" aria-label="能力包：软件开发工具包；查看释义">能力包</a>（<a class="term" data-glossary="0" title="软件开发工具包：这里指供原服务直接调用的能力包。" href="#term-detail-1" aria-label="SDK：软件开发工具包；查看释义">SDK</a>）和状态查询。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E1" href="#evidence-1" title="演示保留原入口、引入进程内能力的设计。&#10;来源：虚构设计稿" aria-label="来源 1：演示保留原入口、引入进程内能力的设计。">[1]</a></sup></p><div class="overview-list"><ul class="overview-topics"><li><strong><a href="#checks">验收</a></strong><span>核对成功、拒绝和重复请求，保留同一编号。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E2" href="#evidence-2" title="要求有效输入可查询结果，重复请求不重复处理。&#10;来源：虚构验收计划" aria-label="来源 2：要求有效输入可查询结果，重复请求不重复处理。">[2]</a></sup></span></li><li><strong><a href="#bounds">边界</a></strong><span><a class="term" data-glossary="0" title="软件开发工具包：这里指供原服务直接调用的能力包。" href="#term-detail-1" aria-label="SDK：软件开发工具包；查看释义">SDK</a> 只负责处理能力，宿主仍负责入口与数据归属。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E1" href="#evidence-1" title="演示保留原入口、引入进程内能力的设计。&#10;来源：虚构设计稿" aria-label="来源 1：演示保留原入口、引入进程内能力的设计。">[1]</a></sup></span></li></ul><section class="overview-progress" aria-label="当前进度"><h3>当前进度</h3><ul><li><span class="badge action" data-attention="action" title="需继续推进">待实施</span><span><strong>改造与验收</strong> · 虚构方案，所有验收待执行。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E2" href="#evidence-2" title="要求有效输入可查询结果，重复请求不重复处理。&#10;来源：虚构验收计划" aria-label="来源 2：要求有效输入可查询结果，重复请求不重复处理。">[2]</a></sup></span></li></ul></section></div><figure class="change-diagram" id="change-diagram-integration" aria-labelledby="change-diagram-integration-heading" data-change-diagram><header class="change-diagram-header"><strong id="change-diagram-integration-heading">接法变化<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E1" href="#evidence-1" title="演示保留原入口、引入进程内能力的设计。&#10;来源：虚构设计稿" aria-label="来源 1：演示保留原入口、引入进程内能力的设计。">[1]</a></sup></strong><span class="diagram-change-key">＋ 新增 · ↻ 修改</span><div class="diagram-state-controls" role="group" aria-label="选择变化视图"><button type="button" data-diagram-view="before" aria-pressed="false" aria-controls="change-diagram-integration-before">改前</button><button type="button" data-diagram-view="change" aria-pressed="true" aria-controls="change-diagram-integration-change">变更</button><button type="button" data-diagram-view="after" aria-pressed="false" aria-controls="change-diagram-integration-after">改后</button></div></header><p class="diagram-note">虚构对比：改前只展示提交入口，后续处理和返回未展开；改后展示待实施的校验、处理与查询职责。</p><p class="diagram-scroll-hint">图较宽时可在图内左右滚动。</p><section class="diagram-scene" id="change-diagram-integration-before" data-diagram-state="before" aria-label="改前"><h4>改前</h4><div class="change-diagram-canvas" tabindex="0" role="region" aria-label="接法变化 · 改前"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 836 210" width="836" height="210" role="img" aria-labelledby="change-diagram-integration-before-title" aria-describedby="change-diagram-integration-before-description" style="--diagram-width:836px"><title id="change-diagram-integration-before-title">接法变化 · 改前</title><desc id="change-diagram-integration-before-description">虚构对比：改前只展示提交入口，后续处理和返回未展开；改后展示待实施的校验、处理与查询职责。节点：原页面、原服务入口。关系：原页面 → 原服务入口（提交请求）</desc><defs><marker id="change-diagram-integration-before-unchanged" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#64748b"/></marker><marker id="change-diagram-integration-before-added" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#15803d"/></marker><marker id="change-diagram-integration-before-removed" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b42318"/></marker><marker id="change-diagram-integration-before-modified" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b45309"/></marker></defs><g class="change-diagram-group"><rect x="224" y="4" width="608" height="200" rx="8"/><text x="236" y="24">同一服务进程</text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="page" data-edge-to="host" data-change="unchanged"><title>提交请求</title><path d="M154 60.0H242" marker-end="url(#change-diagram-integration-before-unchanged)"/><rect class="edge-label-bg" x="168.6" y="35.0" width="58.8" height="19" rx="3"/><text x="198.0" y="47.0" text-anchor="middle"><tspan x="198.0" dy="0">提交请求</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="page" data-change="modified" data-shape="process"><title>原页面 → 原页面＋状态查询；处理／组件；↻ 修改</title><rect x="22" y="38" width="132" height="44" rx="6"/><text x="88.0" y="64.5" text-anchor="middle"><tspan x="88.0" dy="0">原页面</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="host" data-change="unchanged" data-shape="process"><title>原服务入口；处理／组件；保留</title><rect x="242" y="38" width="132" height="44" rx="6"/><text x="308.0" y="64.5" text-anchor="middle"><tspan x="308.0" dy="0">原服务入口</tspan></text></g></svg></div></section><section class="diagram-scene" id="change-diagram-integration-change" data-diagram-state="change" aria-label="变更"><h4>变更</h4><div class="change-diagram-canvas" tabindex="0" role="region" aria-label="接法变化 · 变更"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 836 210" width="836" height="210" role="img" aria-labelledby="change-diagram-integration-change-title" aria-describedby="change-diagram-integration-change-description" style="--diagram-width:836px"><title id="change-diagram-integration-change-title">接法变化 · 变更</title><desc id="change-diagram-integration-change-description">虚构对比：改前只展示提交入口，后续处理和返回未展开；改后展示待实施的校验、处理与查询职责。节点：原页面＋状态查询、原服务入口、输入校验、任务处理、结果查询。关系：原页面＋状态查询 → 原服务入口（提交请求）；原服务入口 → 输入校验（校验输入）；输入校验 → 任务处理（合法则处理）；原服务入口 → 结果查询（按编号查询）</desc><defs><marker id="change-diagram-integration-change-unchanged" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#64748b"/></marker><marker id="change-diagram-integration-change-added" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#15803d"/></marker><marker id="change-diagram-integration-change-removed" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b42318"/></marker><marker id="change-diagram-integration-change-modified" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b45309"/></marker></defs><g class="change-diagram-group"><rect x="224" y="4" width="608" height="200" rx="8"/><text x="236" y="24">同一服务进程</text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="page" data-edge-to="host" data-change="unchanged"><title>提交请求</title><path d="M154 60.0H242" marker-end="url(#change-diagram-integration-change-unchanged)"/><rect class="edge-label-bg" x="168.6" y="35.0" width="58.8" height="19" rx="3"/><text x="198.0" y="47.0" text-anchor="middle"><tspan x="198.0" dy="0">提交请求</tspan></text></g><g class="change-diagram-edge state-added edge-solid" data-edge-from="host" data-edge-to="validate" data-change="added"><title>+ 校验输入</title><path d="M374 60.0H462" marker-end="url(#change-diagram-integration-change-added)"/><rect class="edge-label-bg" x="382.5" y="35.0" width="71.0" height="19" rx="3"/><text x="418.0" y="47.0" text-anchor="middle"><tspan x="418.0" dy="0">+ 校验输入</tspan></text></g><g class="change-diagram-edge state-added edge-solid" data-edge-from="validate" data-edge-to="sdk" data-change="added"><title>+ 合法则处理</title><path d="M594 60.0H682" marker-end="url(#change-diagram-integration-change-added)"/><rect class="edge-label-bg" x="596.4" y="35.0" width="83.19999999999999" height="19" rx="3"/><text x="638.0" y="47.0" text-anchor="middle"><tspan x="638.0" dy="0">+ 合法则处理</tspan></text></g><g class="change-diagram-edge state-added edge-solid" data-edge-from="host" data-edge-to="query" data-change="added"><title>+ 按编号查询</title><path d="M374 60.0H418.0V164.0H462" marker-end="url(#change-diagram-integration-change-added)"/><rect class="edge-label-bg" x="376.4" y="87.0" width="83.19999999999999" height="19" rx="3"/><text x="418.0" y="99.0" text-anchor="middle"><tspan x="418.0" dy="0">+ 按编号查询</tspan></text></g><g class="change-diagram-node state-modified" data-node-id="page" data-change="modified" data-shape="process"><title>原页面 → 原页面＋状态查询；处理／组件；↻ 修改</title><rect x="22" y="38" width="132" height="44" rx="6"/><text x="88.0" y="64.5" text-anchor="middle"><tspan x="88.0" dy="0">原页面＋状态查询</tspan></text><g class="node-change-badge"><rect x="145" y="30" width="16" height="16" rx="8"/><text x="153" y="42" text-anchor="middle">↻</text></g></g><g class="change-diagram-node state-unchanged" data-node-id="host" data-change="unchanged" data-shape="process"><title>原服务入口；处理／组件；保留</title><rect x="242" y="38" width="132" height="44" rx="6"/><text x="308.0" y="64.5" text-anchor="middle"><tspan x="308.0" dy="0">原服务入口</tspan></text></g><g class="change-diagram-node state-added" data-node-id="validate" data-change="added" data-shape="process"><title>输入校验；处理／组件；＋ 新增</title><rect x="462" y="38" width="132" height="44" rx="6"/><text x="528.0" y="64.5" text-anchor="middle"><tspan x="528.0" dy="0">输入校验</tspan></text><g class="node-change-badge"><rect x="585" y="30" width="16" height="16" rx="8"/><text x="593" y="42" text-anchor="middle">+</text></g></g><g class="change-diagram-node state-added" data-node-id="sdk" data-change="added" data-shape="process"><title>任务处理；处理／组件；＋ 新增</title><rect x="682" y="38" width="132" height="44" rx="6"/><text x="748.0" y="64.5" text-anchor="middle"><tspan x="748.0" dy="0">任务处理</tspan></text><g class="node-change-badge"><rect x="805" y="30" width="16" height="16" rx="8"/><text x="813" y="42" text-anchor="middle">+</text></g></g><g class="change-diagram-node state-added" data-node-id="query" data-change="added" data-shape="process"><title>结果查询；处理／组件；＋ 新增</title><rect x="462" y="142" width="132" height="44" rx="6"/><text x="528.0" y="168.5" text-anchor="middle"><tspan x="528.0" dy="0">结果查询</tspan></text><g class="node-change-badge"><rect x="585" y="134" width="16" height="16" rx="8"/><text x="593" y="146" text-anchor="middle">+</text></g></g></svg></div></section><section class="diagram-scene" id="change-diagram-integration-after" data-diagram-state="after" aria-label="改后"><h4>改后</h4><div class="change-diagram-canvas" tabindex="0" role="region" aria-label="接法变化 · 改后"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 836 210" width="836" height="210" role="img" aria-labelledby="change-diagram-integration-after-title" aria-describedby="change-diagram-integration-after-description" style="--diagram-width:836px"><title id="change-diagram-integration-after-title">接法变化 · 改后</title><desc id="change-diagram-integration-after-description">虚构对比：改前只展示提交入口，后续处理和返回未展开；改后展示待实施的校验、处理与查询职责。节点：原页面＋状态查询、原服务入口、输入校验、任务处理、结果查询。关系：原页面＋状态查询 → 原服务入口（提交请求）；原服务入口 → 输入校验（校验输入）；输入校验 → 任务处理（合法则处理）；原服务入口 → 结果查询（按编号查询）</desc><defs><marker id="change-diagram-integration-after-unchanged" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#64748b"/></marker><marker id="change-diagram-integration-after-added" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#15803d"/></marker><marker id="change-diagram-integration-after-removed" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b42318"/></marker><marker id="change-diagram-integration-after-modified" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b45309"/></marker></defs><g class="change-diagram-group"><rect x="224" y="4" width="608" height="200" rx="8"/><text x="236" y="24">同一服务进程</text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="page" data-edge-to="host" data-change="unchanged"><title>提交请求</title><path d="M154 60.0H242" marker-end="url(#change-diagram-integration-after-unchanged)"/><rect class="edge-label-bg" x="168.6" y="35.0" width="58.8" height="19" rx="3"/><text x="198.0" y="47.0" text-anchor="middle"><tspan x="198.0" dy="0">提交请求</tspan></text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="host" data-edge-to="validate" data-change="added"><title>校验输入</title><path d="M374 60.0H462" marker-end="url(#change-diagram-integration-after-unchanged)"/><rect class="edge-label-bg" x="388.6" y="35.0" width="58.8" height="19" rx="3"/><text x="418.0" y="47.0" text-anchor="middle"><tspan x="418.0" dy="0">校验输入</tspan></text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="validate" data-edge-to="sdk" data-change="added"><title>合法则处理</title><path d="M594 60.0H682" marker-end="url(#change-diagram-integration-after-unchanged)"/><rect class="edge-label-bg" x="602.5" y="35.0" width="71.0" height="19" rx="3"/><text x="638.0" y="47.0" text-anchor="middle"><tspan x="638.0" dy="0">合法则处理</tspan></text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="host" data-edge-to="query" data-change="added"><title>按编号查询</title><path d="M374 60.0H418.0V164.0H462" marker-end="url(#change-diagram-integration-after-unchanged)"/><rect class="edge-label-bg" x="382.5" y="87.0" width="71.0" height="19" rx="3"/><text x="418.0" y="99.0" text-anchor="middle"><tspan x="418.0" dy="0">按编号查询</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="page" data-change="modified" data-shape="process"><title>原页面 → 原页面＋状态查询；处理／组件；↻ 修改</title><rect x="22" y="38" width="132" height="44" rx="6"/><text x="88.0" y="64.5" text-anchor="middle"><tspan x="88.0" dy="0">原页面＋状态查询</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="host" data-change="unchanged" data-shape="process"><title>原服务入口；处理／组件；保留</title><rect x="242" y="38" width="132" height="44" rx="6"/><text x="308.0" y="64.5" text-anchor="middle"><tspan x="308.0" dy="0">原服务入口</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="validate" data-change="added" data-shape="process"><title>输入校验；处理／组件；＋ 新增</title><rect x="462" y="38" width="132" height="44" rx="6"/><text x="528.0" y="64.5" text-anchor="middle"><tspan x="528.0" dy="0">输入校验</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="sdk" data-change="added" data-shape="process"><title>任务处理；处理／组件；＋ 新增</title><rect x="682" y="38" width="132" height="44" rx="6"/><text x="748.0" y="64.5" text-anchor="middle"><tspan x="748.0" dy="0">任务处理</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="query" data-change="added" data-shape="process"><title>结果查询；处理／组件；＋ 新增</title><rect x="462" y="142" width="132" height="44" rx="6"/><text x="528.0" y="168.5" text-anchor="middle"><tspan x="528.0" dy="0">结果查询</tspan></text></g></svg></div></section><details class="change-diagram-legend" open><summary>图例</summary><div><span data-legend-shape="process"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><rect x="2" y="2" width="28" height="18" rx="6"/></svg>处理／组件</span><span class="state-key state-unchanged" data-legend-change="unchanged">保留</span><span class="state-key state-added" data-legend-change="added">＋ 新增</span><span class="state-key state-modified" data-legend-change="modified">↻ 修改</span><span data-legend-edge="solid"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><path d="M2 12H29M23 7L29 12L23 17" fill="none"/></svg>实线箭头：关系／调用方向</span><span data-legend-group><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><rect class="legend-group" x="2" y="3" width="28" height="18" rx="3"/></svg>背景框：同一边界／分组</span></div></details></figure><p class="reader-answer"><strong>下一步：</strong>集成组先接通提交、处理、查询，再验无效输入和重复请求。</p><aside class="section-sources" aria-label="本节来源"><h3>来源</h3><ol><li id="evidence-1" value="1" tabindex="-1"><div class="source-title"><a href="#source-detail-1">虚构设计稿</a></div></li><li id="evidence-2" value="2" tabindex="-1"><div class="source-title"><a href="#source-detail-2">虚构验收计划</a></div></li></ol></aside></section><section class="section" id="checks" data-chapter="2"><h2 tabindex="-1"><span class="outline-number">2</span> 验收</h2><p class="section-subtitle nav-subtitle">怎样确认结果可信？</p><div class="section-summary"><p>核对成功、拒绝和重复请求，保留同一编号。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E2" href="#source-2" title="要求有效输入可查询结果，重复请求不重复处理。&#10;来源：虚构验收计划" aria-label="来源 2：要求有效输入可查询结果，重复请求不重复处理。">[2]</a></sup></p></div><div class="section-content"><figure class="change-diagram" id="change-diagram-acceptance" aria-labelledby="change-diagram-acceptance-heading" data-change-diagram><header class="change-diagram-header"><strong id="change-diagram-acceptance-heading">成功与拒绝都要验证<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E2" href="#source-2" title="要求有效输入可查询结果，重复请求不重复处理。&#10;来源：虚构验收计划" aria-label="来源 2：要求有效输入可查询结果，重复请求不重复处理。">[2]</a></sup></strong></header><p class="diagram-note">待执行的验收计划；箭头文字说明分支，不执行业务。</p><p class="diagram-scroll-hint">图较宽时可在图内左右滚动。</p><section class="diagram-scene" id="change-diagram-acceptance-after" data-diagram-state="after" aria-label="结构"><h4>结构</h4><div class="change-diagram-canvas" tabindex="0" role="region" aria-label="成功与拒绝都要验证 · 结构"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 396 622" width="396" height="622" role="img" aria-labelledby="change-diagram-acceptance-after-title" aria-describedby="change-diagram-acceptance-after-description" style="--diagram-width:396px"><title id="change-diagram-acceptance-after-title">成功与拒绝都要验证 · 结构</title><desc id="change-diagram-acceptance-after-description">待执行的验收计划；箭头文字说明分支，不执行业务。节点：开始、提交输入、输入有效？、记录唯一结果、拒绝并提示原因、可查询结果。关系：开始 → 提交输入（开始提交）；提交输入 → 输入有效？（校验输入）；输入有效？ → 记录唯一结果（是：去重处理）；输入有效？ → 拒绝并提示原因（否：拒绝）；记录唯一结果 → 可查询结果（返回编号）</desc><defs><marker id="change-diagram-acceptance-after-unchanged" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#64748b"/></marker><marker id="change-diagram-acceptance-after-added" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#15803d"/></marker><marker id="change-diagram-acceptance-after-removed" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b42318"/></marker><marker id="change-diagram-acceptance-after-modified" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8Z" fill="#b45309"/></marker></defs><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="start" data-edge-to="input" data-change="unchanged"><title>开始提交</title><path d="M88.0 102V162" marker-end="url(#change-diagram-acceptance-after-unchanged)"/><rect class="edge-label-bg" x="120.6" y="120.0" width="58.8" height="19" rx="3"/><text x="150.0" y="132.0" text-anchor="middle"><tspan x="150.0" dy="0">开始提交</tspan></text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="input" data-edge-to="valid" data-change="unchanged"><title>校验输入</title><path d="M88.0 226V286" marker-end="url(#change-diagram-acceptance-after-unchanged)"/><rect class="edge-label-bg" x="120.6" y="244.0" width="58.8" height="19" rx="3"/><text x="150.0" y="256.0" text-anchor="middle"><tspan x="150.0" dy="0">校验输入</tspan></text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="valid" data-edge-to="save" data-change="unchanged"><title>是：去重处理</title><path d="M88.0 350V410" marker-end="url(#change-diagram-acceptance-after-unchanged)"/><rect class="edge-label-bg" x="108.4" y="368.0" width="83.19999999999999" height="19" rx="3"/><text x="150.0" y="380.0" text-anchor="middle"><tspan x="150.0" dy="0">是：去重处理</tspan></text></g><g class="change-diagram-edge state-unchanged edge-dashed" data-edge-from="valid" data-edge-to="reject" data-change="unchanged"><title>否：拒绝</title><path d="M154 318.0H242" marker-end="url(#change-diagram-acceptance-after-unchanged)"/><rect class="edge-label-bg" x="168.6" y="293.0" width="58.8" height="19" rx="3"/><text x="198.0" y="305.0" text-anchor="middle"><tspan x="198.0" dy="0">否：拒绝</tspan></text></g><g class="change-diagram-edge state-unchanged edge-solid" data-edge-from="save" data-edge-to="end" data-change="unchanged"><title>返回编号</title><path d="M88.0 474V534" marker-end="url(#change-diagram-acceptance-after-unchanged)"/><rect class="edge-label-bg" x="120.6" y="492.0" width="58.8" height="19" rx="3"/><text x="150.0" y="504.0" text-anchor="middle"><tspan x="150.0" dy="0">返回编号</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="start" data-change="unchanged" data-shape="terminator"><title>开始；开始／结束</title><rect x="22" y="38" width="132" height="64" rx="32.0"/><text x="88.0" y="74.5" text-anchor="middle"><tspan x="88.0" dy="0">开始</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="input" data-change="unchanged" data-shape="data"><title>提交输入；输入／输出</title><polygon points="40,162 154,162 136,226 22,226"/><text x="88.0" y="198.5" text-anchor="middle"><tspan x="88.0" dy="0">提交输入</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="valid" data-change="unchanged" data-shape="decision"><title>输入有效？；判断／分支</title><polygon points="88.0,286 154,318.0 88.0,350 22,318.0"/><text x="88.0" y="322.5" text-anchor="middle"><tspan x="88.0" dy="0">输入有效？</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="save" data-change="unchanged" data-shape="store"><title>记录唯一结果；数据存储</title><path d="M22 422a66.0 12 0 0 1 132 0v40a66.0 12 0 0 1 -132 0Z"/><ellipse class="store-top" cx="88.0" cy="422" rx="66.0" ry="12"/><text x="88.0" y="446.5" text-anchor="middle"><tspan x="88.0" dy="0">记录唯一结果</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="reject" data-change="unchanged" data-shape="process"><title>拒绝并提示原因；处理／组件</title><rect x="242" y="286" width="132" height="64" rx="6"/><text x="308.0" y="322.5" text-anchor="middle"><tspan x="308.0" dy="0">拒绝并提示原因</tspan></text></g><g class="change-diagram-node state-unchanged" data-node-id="end" data-change="unchanged" data-shape="terminator"><title>可查询结果；开始／结束</title><rect x="22" y="534" width="132" height="64" rx="32.0"/><text x="88.0" y="570.5" text-anchor="middle"><tspan x="88.0" dy="0">可查询结果</tspan></text></g></svg></div></section><details class="change-diagram-legend" open><summary>图例</summary><div><span data-legend-shape="process"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><rect x="2" y="2" width="28" height="18" rx="6"/></svg>处理／组件</span><span data-legend-shape="decision"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><polygon points="16.0,2 30,11.0 16.0,20 2,11.0"/></svg>判断／分支</span><span data-legend-shape="terminator"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><rect x="2" y="2" width="28" height="18" rx="9.0"/></svg>开始／结束</span><span data-legend-shape="store"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><path d="M2 5.6a14.0 3.6 0 0 1 28 0v10.8a14.0 3.6 0 0 1 -28 0Z"/><ellipse class="store-top" cx="16.0" cy="5.6" rx="14.0" ry="3.6"/></svg>数据存储</span><span data-legend-shape="data"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><polygon points="20,2 30,2 12,20 2,20"/></svg>输入／输出</span><span data-legend-edge="solid"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><path d="M2 12H29M23 7L29 12L23 17" fill="none"/></svg>实线箭头：关系／调用方向</span><span data-legend-edge="dashed"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><path d="M2 12H29M23 7L29 12L23 17" fill="none" stroke-dasharray="4 3"/></svg>虚线箭头：具体关系见边标签</span></div></details></figure></div><aside class="section-sources" aria-label="本节来源"><h3>来源</h3><ol><li id="source-2" value="2" tabindex="-1"><div class="source-title"><a href="#source-detail-2">虚构验收计划</a></div></li></ol></aside></section><section class="section" id="bounds" data-chapter="3"><h2 tabindex="-1"><span class="outline-number">3</span> 边界</h2><p class="section-subtitle nav-subtitle">哪些内容仍需补齐？</p><div class="section-summary"><p><a class="term" data-glossary="0" title="软件开发工具包：这里指供原服务直接调用的能力包。" href="#term-detail-1" aria-label="SDK：软件开发工具包；查看释义">SDK</a> 只负责处理能力，宿主仍负责入口与数据归属。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E1" href="#source-1" title="演示保留原入口、引入进程内能力的设计。&#10;来源：虚构设计稿" aria-label="来源 1：演示保留原入口、引入进程内能力的设计。">[1]</a></sup></p></div><div class="section-content"><div class="table-wrap" tabindex="0" role="region" aria-label="边界"><table class="content-table"><thead><tr><th scope="col">负责方</th><th scope="col">动作</th></tr></thead><tbody><tr><td data-label="负责方"><p>宿主</p></td><td data-label="动作"><p>校验入口、关联请求与结果。</p></td></tr><tr><td data-label="负责方"><p>集成组</p></td><td data-label="动作"><p>核对事务与异常恢复，再登记验收结果。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E2" href="#source-2-2" title="要求有效输入可查询结果，重复请求不重复处理。&#10;来源：虚构验收计划" aria-label="来源 2：要求有效输入可查询结果，重复请求不重复处理。">[2]</a></sup></p></td></tr></tbody></table></div><details class="fold" id="outline-3-1" data-fold><summary><span class="outline-number">3.1</span> 原示意图</summary><div class="fold-body"><figure class="report-figure"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3ODAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgNzgwIDIwMCI+PHJlY3Qgd2lkdGg9Ijc4MCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNmOGZhZmMiLz48ZyBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjOTRhM2I4Ij48cmVjdCB4PSIyMCIgeT0iNTUiIHdpZHRoPSIyMDAiIGhlaWdodD0iOTAiIHJ4PSIxMiIvPjxyZWN0IHg9IjI5MCIgeT0iNTUiIHdpZHRoPSIyMDAiIGhlaWdodD0iOTAiIHJ4PSIxMiIvPjxyZWN0IHg9IjU2MCIgeT0iNTUiIHdpZHRoPSIyMDAiIGhlaWdodD0iOTAiIHJ4PSIxMiIvPjwvZz48ZyBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMiIgZmlsbD0iIzE4MjIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRleHQgeD0iMTIwIiB5PSIxMDgiPuS4muWKoeWFpeWPozwvdGV4dD48dGV4dCB4PSIzOTAiIHk9IjEwOCI+5p2D6ZmQ5Yik5a6aPC90ZXh0Pjx0ZXh0IHg9IjY2MCIgeT0iMTA4Ij7kuJrliqHmiafooYw8L3RleHQ+PC9nPjxwYXRoIGQ9Ik0yMjAgMTAwSDI5ME00OTAgMTAwSDU2MCIgc3Ryb2tlPSIjMTc1Y2QzIiBzdHJva2Utd2lkdGg9IjMiLz48ZyBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNSIgZmlsbD0iIzM0NDA1NCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRleHQgeD0iMjU1IiB5PSIzOCI+5Y+v5L+h6K+35rGCPC90ZXh0Pjx0ZXh0IHg9IjUyNSIgeT0iMzgiPuWFgeiuuOWQjue7p+e7rTwvdGV4dD48L2c+PC9zdmc+Cg==" alt="虚构原架构示意" tabindex="0" role="button"><figcaption>示意图用于图片交互检查，不是运行截图。<sup class="evidence-refs"><a class="evidence-ref" data-evidence="E1" href="#source-1" title="演示保留原入口、引入进程内能力的设计。&#10;来源：虚构设计稿" aria-label="来源 1：演示保留原入口、引入进程内能力的设计。">[1]</a></sup></figcaption></figure></div></details></div><aside class="section-sources" aria-label="本节来源"><h3>来源</h3><ol><li id="source-1" value="1" tabindex="-1"><div class="source-title"><a href="#source-detail-1">虚构设计稿</a></div></li><li id="source-2-2" value="2" tabindex="-1"><div class="source-title"><a href="#source-detail-2">虚构验收计划</a></div></li></ol></aside></section><section class="section" id="appendix" data-chapter="4"><h2 tabindex="-1"><span class="outline-number">4</span> 附录</h2><details class="fold" id="outline-4-1" data-fold><summary><span class="outline-number">4.1</span> 范围与背景</summary><div class="fold-body"><div class="report-meta"><p>先看接法变化，再看验收和边界；全部内容均为虚构方案。</p><div class="meta"><span>技术方案简报</span><span>生成时间：虚构示例</span><span>未运行服务，不构成业务验收</span></div></div></div></details><details class="fold" id="outline-4-2" data-fold><summary><span class="outline-number">4.2</span> 来源详情与限制</summary><div class="fold-body"><div class="table-wrap" role="region" aria-label="证据清单" tabindex="0"><table class="content-table evidence-table"><thead><tr><th scope="col">编号与证明内容</th><th scope="col">来源与原项入口</th><th scope="col">范围与限制</th></tr></thead><tbody><tr id="source-detail-1" tabindex="-1"><td data-label="编号与证明内容"><strong>[1]</strong><p>演示保留原入口、引入进程内能力的设计。</p></td><td data-label="来源与原项入口"><p>虚构设计稿</p><p>接法说明</p><p>未提供可跳转原项；请按来源与定位核对。</p></td><td data-label="范围与限制"><ul><li>源码与构建</li><li>限制：设计材料，不证明已经实现。</li></ul></td></tr><tr id="source-detail-2" tabindex="-1"><td data-label="编号与证明内容"><strong>[2]</strong><p>要求有效输入可查询结果，重复请求不重复处理。</p></td><td data-label="来源与原项入口"><p>虚构验收计划</p><p>示例没有真实测试记录。</p></td><td data-label="范围与限制"><ul><li>运行与交互</li><li>限制：计划，不是执行结果。</li></ul></td></tr></tbody></table></div></div></details><details class="fold" id="outline-4-3" data-fold><summary><span class="outline-number">4.3</span> 代号与术语原文释义</summary><div class="fold-body"><p>下划线原词可悬停或聚焦预览，点击查看完整原文、解释与出处。无脚本时跳到本表；打印保留全部释义。</p><article class="definition" id="term-detail-1"><h3>SDK · 软件开发工具包</h3><p><strong>通俗解释：</strong>这里指供原服务直接调用的能力包。</p><p><strong>适用边界：</strong>本例用词，不表示已有可发布产物。</p></article></div></details></section><footer class="print-only">处理能力怎样并入现有服务 · 虚构示例</footer></main>
+<dialog id="chapter-dialog" class="chapter-dialog" aria-labelledby="chapter-title"><div class="reader-dialog-head"><strong id="chapter-title">章节内容</strong><button data-close-dialog>关闭</button></div><div id="chapter-body" class="reader-dialog-body"></div></dialog>
+<dialog id="component-dialog" class="component-dialog" aria-label="组件职责与依据"><div class="reader-dialog-head"><strong>组件职责与依据</strong><button data-close-dialog>关闭</button></div><div class="reader-dialog-body"></div></dialog>
+<dialog id="figure-dialog" class="figure-dialog" aria-label="图片预览"><div class="reader-dialog-head"><strong>图片预览</strong><button data-zoom="out">缩小</button><button data-zoom="in">放大</button><button data-close-dialog>关闭</button></div><div class="figure-stage"><img alt=""></div></dialog>
+<dialog id="drawer" aria-label="详情与证据"><div class="drawer"><div class="drawer-head"><strong>详情与证据</strong><button class="close" id="close">关闭</button></div><div class="resize" id="resize" role="separator" tabindex="0" aria-label="调整详情宽度" aria-orientation="vertical"></div><div class="drawer-body" id="drawer-body"></div></div></dialog>
+<dialog id="term-dialog" class="term-dialog" aria-labelledby="term-dialog-title"><div class="drawer-head"><strong id="term-dialog-title">原文与释义</strong><button id="term-close">关闭释义</button></div><div class="drawer-body" id="term-dialog-body"></div></dialog>
+<div class="term-popover" id="term-popover" role="tooltip" hidden></div><div class="citation-popover" id="citation-popover" role="tooltip" hidden></div><script type="application/json" id="report-data">{"title":"处理能力怎样并入现有服务","generatedAt":"虚构示例","reportType":"brief","readingMode":"focus","subtitle":"先看接法变化，再看验收和边界；全部内容均为虚构方案。","scope":["未运行服务，不构成业务验收"],"verdict":{"label":"沿用原入口，在同一进程补上处理能力","summary":"原页面继续使用，新增处理能力包（SDK）和状态查询。[[E1]]","diagramId":"integration","next":"集成组先接通提交、处理、查询，再验无效输入和重复请求。","topics":["checks","bounds"],"progress":[{"title":"改造与验收","status":"待实施","summary":"虚构方案，所有验收待执行。","evidence":["E2"]}]},"findings":[],"evidence":[{"id":"E1","level":"SOURCE_BUILD","source":"虚构设计稿","summary":"演示保留原入口、引入进程内能力的设计。","locator":"接法说明","limitation":"设计材料，不证明已经实现。"},{"id":"E2","level":"RUNTIME_UI","source":"虚构验收计划","summary":"要求有效输入可查询结果，重复请求不重复处理。","accessNote":"示例没有真实测试记录。","limitation":"计划，不是执行结果。"}],"diagrams":[{"id":"integration","title":"接法变化","kind":"architecture","direction":"LR","note":"虚构对比：改前只展示提交入口，后续处理和返回未展开；改后展示待实施的校验、处理与查询职责。","nodes":[{"id":"page","label":"原页面＋状态查询","beforeLabel":"原页面","shape":"process","change":"modified","column":0,"row":0},{"id":"host","label":"原服务入口","shape":"process","column":1,"row":0},{"id":"validate","label":"输入校验","shape":"process","change":"added","column":2,"row":0},{"id":"sdk","label":"任务处理","shape":"process","change":"added","column":3,"row":0},{"id":"query","label":"结果查询","shape":"process","change":"added","column":2,"row":1}],"edges":[{"from":"page","to":"host","label":"提交请求"},{"from":"host","to":"validate","label":"校验输入","change":"added"},{"from":"validate","to":"sdk","label":"合法则处理","change":"added"},{"from":"host","to":"query","label":"按编号查询","change":"added"}],"groups":[{"id":"host-process","label":"同一服务进程","nodes":["host","validate","sdk","query"]}],"evidence":["E1"]},{"id":"acceptance","title":"成功与拒绝都要验证","kind":"flow","direction":"TB","note":"待执行的验收计划；箭头文字说明分支，不执行业务。","nodes":[{"id":"start","label":"开始","shape":"terminator","column":0,"row":0},{"id":"input","label":"提交输入","shape":"data","column":0,"row":1},{"id":"valid","label":"输入有效？","shape":"decision","column":0,"row":2},{"id":"save","label":"记录唯一结果","shape":"store","column":0,"row":3},{"id":"reject","label":"拒绝并提示原因","shape":"process","column":1,"row":2},{"id":"end","label":"可查询结果","shape":"terminator","column":0,"row":4}],"edges":[{"from":"start","to":"input","label":"开始提交"},{"from":"input","to":"valid","label":"校验输入"},{"from":"valid","to":"save","label":"是：去重处理"},{"from":"valid","to":"reject","label":"否：拒绝","style":"dashed"},{"from":"save","to":"end","label":"返回编号"}],"evidence":["E2"]}],"sections":[{"id":"checks","title":"验收","subtitle":"怎样确认结果可信？","summary":"核对成功、拒绝和重复请求，保留同一编号。[[E2]]","kind":"diagram","diagramId":"acceptance"},{"id":"bounds","title":"边界","subtitle":"哪些内容仍需补齐？","summary":"SDK 只负责处理能力，宿主仍负责入口与数据归属。[[E1]]","kind":"table","columns":["负责方","动作"],"rows":[["宿主","校验入口、关联请求与结果。"],["集成组","核对事务与异常恢复，再登记验收结果。[[E2]]"]],"folds":[{"title":"原示意图","kind":"figure","figure":{"src":"assets/architecture.svg","alt":"虚构原架构示意","caption":"示意图用于图片交互检查，不是运行截图。","evidence":["E1"]}}]}],"glossary":[{"term":"SDK","full":"软件开发工具包","explanation":"这里指供原服务直接调用的能力包。","aliases":["能力包"],"scopeNote":"本例用词，不表示已有可发布产物。"}],"highlights":[{"label":"先验什么","value":"成功、拒绝、重复请求","target":"checks"},{"label":"范围","value":"虚构方案，尚待实施","target":"bounds"}]}</script><script>'use strict';
+const data = JSON.parse(document.getElementById('report-data').textContent);
+const $ = selector => document.querySelector(selector);
+const drawer = $('#drawer');
+let lastFocus = null;
+const templates = new Map([...document.querySelectorAll('template[data-finding]')].map(t => [t.dataset.finding, t]));
+document.addEventListener('click', event => {
+  const button = event.target.closest?.('.finding');
+  if (!button) return;
+  lastFocus = button;
+  $('#drawer-body').replaceChildren(templates.get(button.dataset.id).content.cloneNode(true));
+  drawer.showModal();
+  $('#close').focus();
+});
+$('#close').addEventListener('click', () => drawer.close());
+drawer.addEventListener('close', () => { hideTerm(); lastFocus?.focus(); });
+
+const rows = [...document.querySelectorAll('#finding-rows tr')];
+const search = $('#search');
+let activeStatus = '';
+function filterFindings() {
+  const query = search.value.trim().toLocaleLowerCase();
+  let count = 0;
+  rows.forEach(row => {
+    row.hidden = (!!activeStatus && row.dataset.status !== activeStatus) || (!!query && !row.dataset.search.toLocaleLowerCase().includes(query));
+    if (!row.hidden) count += 1;
+  });
+  $('#count').textContent = `显示 ${count} / ${rows.length} 项`;
+  $('#empty').hidden = count > 0;
+  document.querySelectorAll('[data-status-filter]').forEach(button => {
+    const selected = button.dataset.statusFilter === activeStatus;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+}
+if (search) {
+  search.addEventListener('input', filterFindings);
+  document.querySelectorAll('[data-status-filter]').forEach(button => button.addEventListener('click', () => { activeStatus = button.dataset.statusFilter; filterFindings(); }));
+  $('#reset').addEventListener('click', () => { activeStatus = ''; search.value = ''; filterFindings(); search.focus(); });
+  filterFindings();
+}
+
+const resize = $('#resize');
+let dragging = false;
+function setWidth(width) { document.documentElement.style.setProperty('--drawer-width', Math.max(360, Math.min(1120, innerWidth, width)) + 'px'); }
+resize.addEventListener('pointerdown', event => { dragging = true; resize.setPointerCapture(event.pointerId); });
+resize.addEventListener('pointermove', event => { if (dragging) setWidth(innerWidth - event.clientX); });
+resize.addEventListener('pointerup', () => { dragging = false; });
+resize.addEventListener('pointercancel', () => { dragging = false; });
+resize.addEventListener('keydown', event => {
+  if (['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    event.preventDefault();
+    setWidth(drawer.getBoundingClientRect().width + (event.key === 'ArrowLeft' ? 32 : -32));
+  }
+});
+
+const popover = $('#term-popover');
+const termDialog = $('#term-dialog');
+let termFocus = null;
+let previewTerm = null;
+function showTerm(element) {
+  const term = (data.glossary || [])[Number(element.dataset.glossary)];
+  if (!term) return;
+  // Modal dialogs occupy the browser's top layer; tooltip must share it.
+  const container = element.closest('dialog') || document.body;
+  if (popover.parentElement !== container) container.append(popover);
+  const heading = document.createElement('strong');
+  heading.className = 'term-preview-title';
+  heading.textContent = term.term + (term.full ? ' · ' + term.full : '');
+  const description = document.createElement('p');
+  description.className = 'term-preview-explanation';
+  description.textContent = term.explanation;
+  popover.replaceChildren(heading, description);
+  if (term.original) {
+    const quote = document.createElement('blockquote');
+    quote.className = 'term-preview-quote';
+    quote.textContent = '原文：' + term.original;
+    const source = document.createElement('p');
+    source.className = 'term-preview-source';
+    const sourceLabel = term.source.split(/[\\/]/).at(-1);
+    source.textContent = '出处：' + (sourceLabel.length > 140 ? sourceLabel.slice(0,100) + '…' + sourceLabel.slice(-30) : sourceLabel);
+    popover.append(quote, source);
+  }
+  if (term.scopeNote) {
+    const note = document.createElement('p');
+    note.className = 'term-preview-scope';
+    note.textContent = '边界：' + term.scopeNote;
+    popover.append(note);
+  }
+  const hint = document.createElement('small');
+  hint.textContent = '此处为预览；点击原词查看完整原文、出处与依据';
+  popover.append(hint);
+  previewTerm?.removeAttribute('aria-describedby');
+  previewTerm = element;
+  element.setAttribute('aria-describedby', 'term-popover');
+  popover.hidden = false;
+  const rect = element.getBoundingClientRect();
+  const box = popover.getBoundingClientRect();
+  popover.style.left = Math.max(12, Math.min(innerWidth - box.width - 12, rect.left)) + 'px';
+  popover.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, rect.top > box.height + 18 ? rect.top - box.height - 10 : rect.bottom + 10)) + 'px';
+}
+function hideTerm() { popover.hidden = true; previewTerm?.removeAttribute('aria-describedby'); previewTerm = null; }
+
+document.addEventListener('click', event => {
+  const term = event.target.closest?.('a.term');
+  if (!term || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  const target = document.getElementById(term.getAttribute('href').slice(1));
+  if (!target) return;
+  event.preventDefault();
+  hideTerm();
+  termFocus = term;
+  const detail = target.cloneNode(true);
+  detail.removeAttribute('id');
+  $('#term-dialog-body').replaceChildren(detail);
+  termDialog.showModal();
+  $('#term-close').focus();
+});
+$('#term-close').addEventListener('click', () => termDialog.close());
+termDialog.addEventListener('close', () => { hideTerm(); termFocus?.focus(); termFocus = null; });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') hideTerm(); });
+document.addEventListener('mouseover', event => { const term = event.target.closest?.('.term'); if (term) showTerm(term); });
+document.addEventListener('mouseout', event => { if (event.target.closest?.('.term')) hideTerm(); });
+document.addEventListener('focusin', event => { const term = event.target.closest?.('.term'); if (term) showTerm(term); });
+document.addEventListener('focusout', event => { if (event.target.closest?.('.term')) hideTerm(); });
+addEventListener('resize', hideTerm);
+addEventListener('scroll', () => {
+  const term = previewTerm || document.activeElement;
+  if (!term?.matches('.term')) { hideTerm(); return; }
+  const rect = term.getBoundingClientRect();
+  if (rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth) showTerm(term);
+  else hideTerm();
+}, true);
+
+document.documentElement.classList.add('js-enabled');
+const folds = [...document.querySelectorAll('details[data-fold]')];
+function updateFoldCount() {
+  const counter = $('#fold-status');
+  if (counter) counter.textContent = `详情已展开 ${folds.filter(fold => fold.open).length} / ${folds.length} 项`;
+}
+folds.forEach(fold => fold.addEventListener('toggle', updateFoldCount));
+document.querySelectorAll('[data-fold-action]').forEach(button => button.addEventListener('click', () => {
+  folds.forEach(fold => { fold.open = button.dataset.foldAction === 'expand'; });
+  updateFoldCount();
+}));
+function revealAnchor(hash) {
+  if (data.readingMode !== 'continuous') return;
+  let id;
+  try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
+  const target = document.getElementById(id);
+  if (!target) return;
+  if (target.tagName === 'DETAILS') target.open = true;
+  for (let parent = target.parentElement; parent; parent = parent.parentElement) {
+    if (parent.tagName === 'DETAILS') parent.open = true;
+  }
+  // Chapter navigation exposes its primary content, leaving optional deeper folds alone.
+  target.querySelector(':scope > details[data-primary],:scope > .section-content > details[data-primary]')?.setAttribute('open', '');
+  updateFoldCount();
+  requestAnimationFrame(() => { target.scrollIntoView({block:'start',behavior:'instant'}); updateReadingPosition(); });
+}
+document.addEventListener('click', event => {
+  const link = event.target.closest?.('a[href^="#"]');
+  if (!link || event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  if (link.closest('#term-dialog') && termDialog.open) { termFocus = null; termDialog.close(); }
+  if (link.closest('dialog') && drawer.open) drawer.close();
+  revealAnchor(link.getAttribute('href'));
+});
+addEventListener('hashchange', () => revealAnchor(location.hash));
+updateFoldCount();
+
+const chapters = [...document.querySelectorAll('section[data-chapter]')];
+const chapterLinks = [...document.querySelectorAll('.nav a')];
+let readingFrame = null;
+function updateReadingPosition() {
+  if (data.readingMode !== 'continuous') return;
+  const line = ($('.report-navigation')?.getBoundingClientRect().height || 0) + 24;
+  let current = chapters[0];
+  for (const chapter of chapters) {
+    if (chapter.getBoundingClientRect().top <= line) current = chapter;
+    else break;
+  }
+  if (!current) return;
+  if (scrollY > 0 && innerHeight + scrollY >= document.documentElement.scrollHeight - 2) current = chapters.at(-1);
+  const title = current.querySelector('h2')?.textContent.replace(/^\s*[\d.]+\s*/, '') || '';
+  $('#reading-position').textContent = `阅读位置 ${current.dataset.chapter} / ${chapters.length} · ${title}`;
+  chapterLinks.forEach(link => {
+    const active = link.getAttribute('href') === '#'+current.id;
+    const changed = active && !link.hasAttribute('aria-current');
+    if (active) link.setAttribute('aria-current','location');
+    else link.removeAttribute('aria-current');
+    if (changed) {
+      const nav = link.parentElement;
+      const box = link.getBoundingClientRect(), parent = nav.getBoundingClientRect();
+      if (box.left < parent.left || box.right > parent.right) nav.scrollLeft += box.left - parent.left - 12;
+    }
+  });
+}
+function scheduleReadingPosition() {
+  if (readingFrame !== null) return;
+  readingFrame = requestAnimationFrame(() => { readingFrame = null; updateReadingPosition(); });
+}
+addEventListener('scroll',scheduleReadingPosition,{passive:true});
+addEventListener('resize',scheduleReadingPosition);
+folds.forEach(fold => fold.addEventListener('toggle',scheduleReadingPosition));
+updateReadingPosition();
+if (location.hash) revealAnchor(location.hash);
+
+let foldState = null;
+addEventListener('beforeprint', () => {
+  if (foldState) return; // Some print engines dispatch beforeprint twice.
+  foldState = [...document.querySelectorAll('details')].map(element => [element, element.open]);
+  foldState.forEach(([element]) => { element.open = true; });
+});
+addEventListener('afterprint', () => { foldState?.forEach(([element, open]) => { element.open = open; }); foldState = null; updateFoldCount(); });
+
+(() => {
+  const model = JSON.parse(document.getElementById('report-data').textContent);
+  const chapter = document.getElementById('chapter-dialog');
+  const nodeDialog = document.getElementById('component-dialog');
+  const figure = document.getElementById('figure-dialog');
+  const returnTargets = new WeakMap();
+  let cloneSequence = 0;
+  function open(dialog, trigger) {
+    returnTargets.set(dialog, trigger);
+    if (!dialog.open) dialog.showModal();
+    dialog.querySelector('[data-close-dialog]').focus();
+  }
+  for (const dialog of [chapter, nodeDialog, figure]) {
+    dialog.querySelector('[data-close-dialog]').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close(); } });
+    dialog.addEventListener('close', () => { returnTargets.get(dialog)?.focus({ preventScroll: true }); if (dialog === chapter) { document.getElementById('chapter-body').replaceChildren(); updateReadingPosition(); } });
+  }
+  function cloneChapter(source) {
+    const copy = source.cloneNode(true), prefix = 'chapter-copy-' + (++cloneSequence) + '-';
+    const ids = new Map();
+    for (const element of [copy, ...copy.querySelectorAll('[id]')]) {
+      if (element.id) { ids.set(element.id, prefix + element.id); element.dataset.originalId = element.id; element.id = prefix + element.id; }
+    }
+    copy.querySelectorAll('a[href^="#"]').forEach(a => { const old = a.getAttribute('href').slice(1); if (ids.has(old)) a.setAttribute('href', '#' + ids.get(old)); });
+    copy.querySelectorAll('[aria-labelledby],[aria-describedby],[aria-controls]').forEach(el => { for (const attr of ['aria-labelledby', 'aria-describedby', 'aria-controls']) if (el.hasAttribute(attr)) el.setAttribute(attr, el.getAttribute(attr).split(' ').map(id => ids.get(id) || id).join(' ')); });
+    copy.querySelectorAll('[marker-end],[fill],[clip-path]').forEach(el => { for (const attr of ['marker-end', 'fill', 'clip-path']) if (el.hasAttribute(attr)) el.setAttribute(attr, el.getAttribute(attr).replace(/url\(#([^)]+)\)/g, (all,id) => ids.has(id) ? 'url(#'+ids.get(id)+')' : all)); });
+    copy.querySelectorAll('.print-only,noscript').forEach(el => el.remove());
+    if (copy.tagName === 'DETAILS') copy.open = true;
+    copy.querySelector('details[data-primary]')?.setAttribute('open', '');
+    initExplorers(copy);
+    const search = copy.querySelector('[data-original-id="search"]');
+    if (search) {
+      let status = '';
+      const rows = [...copy.querySelectorAll('tbody tr')];
+      const filter = () => { let count = 0; rows.forEach(row => { row.hidden = (!!status && row.dataset.status !== status) || (!!search.value && !row.dataset.search.toLocaleLowerCase().includes(search.value.toLocaleLowerCase())); if (!row.hidden) count++; }); copy.querySelector('[data-original-id="count"]').textContent = `显示 ${count} / ${rows.length} 项`; copy.querySelector('[data-original-id="empty"]').hidden = count > 0; copy.querySelectorAll('[data-status-filter]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.statusFilter === status)); }); };
+      search.addEventListener('input', filter);
+      copy.querySelectorAll('[data-status-filter]').forEach(b => b.addEventListener('click', () => { status = b.dataset.statusFilter; filter(); }));
+      copy.querySelector('[data-original-id="reset"]').addEventListener('click', () => { status = ''; search.value = ''; filter(); });
+      filter();
+    }
+    return copy;
+  }
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('#report-outline a[href^="#"]');
+    if (model.readingMode === 'continuous' && link && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+      const source = document.getElementById(link.getAttribute('href').slice(1));
+      if (!source) return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      document.getElementById('chapter-title').textContent = link.textContent;
+      document.getElementById('chapter-body').replaceChildren(cloneChapter(source));
+      const primary = source.closest('section[data-chapter]');
+      if (primary) {
+        const count = document.querySelectorAll('.shell>section[data-chapter]').length;
+        document.getElementById('reading-position').textContent = `阅读位置 ${primary.dataset.chapter} / ${count} · ${primary.querySelector('h2')?.textContent || link.textContent}`;
+        document.querySelectorAll('#report-outline a').forEach(a => { if (a.getAttribute('href') === '#'+primary.id) a.setAttribute('aria-current','location'); else a.removeAttribute('aria-current'); });
+      }
+      open(chapter, link);
+      return;
+    }
+    const anchor = event.target.closest?.('#chapter-dialog a[href^="#"],#component-dialog a[href^="#"]');
+    if (anchor && !anchor.classList.contains('term') && !anchor.getAttribute('href').startsWith('#chapter-copy-')) {
+      if (nodeDialog.open) nodeDialog.close();
+      if (chapter.open) chapter.close();
+    }
+  }, true);
+  function setView(view) {
+    document.body.dataset.view = view;
+    document.querySelectorAll('[data-report-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.reportView === view)));
+  }
+  setView(model.readingMode === 'continuous' ? (model.defaultView || (model.schemaVersion === 2 ? 'brief' : 'full')) : 'full');
+  document.querySelectorAll('[data-report-view]').forEach(button => button.addEventListener('click', () => setView(button.dataset.reportView)));
+  function initExplorers(root) {
+    root.querySelectorAll('.scenario-explorer').forEach(explorer => {
+      const select = explorer.querySelector('[data-scenario-select]');
+      const articles = [...explorer.querySelectorAll(':scope > [data-scenario]')];
+      const show = () => articles.forEach(article => { article.hidden = article.dataset.scenario !== select.value; article.dataset.trace = '-1'; article.querySelectorAll('[aria-current=step]').forEach(x => x.removeAttribute('aria-current')); article.querySelectorAll('.executing').forEach(x => x.classList.remove('executing')); const status = article.querySelector('.trace-state'); if (status) status.textContent = '这是说明演示，不发送业务请求。'; });
+      select.addEventListener('change', show); show();
+    });
+  }
+  initExplorers(document);
+  document.addEventListener('click', event => {
+    const button = event.target.closest?.('[data-trace-next]');
+    if (button) {
+      const article = button.closest('[data-scenario]'), steps = [...article.querySelectorAll('.trace-list li')];
+      if (!steps.length) return;
+      const current = ((Number(article.dataset.trace ?? -1)) + 1) % steps.length; article.dataset.trace = String(current);
+      steps.forEach((step, i) => { if (i === current) step.setAttribute('aria-current', 'step'); else step.removeAttribute('aria-current'); });
+      article.querySelectorAll('[data-node]').forEach(node => node.classList.toggle('executing', node.dataset.node === steps[current].dataset.traceNode));
+      article.querySelector('.trace-state').textContent = `第${current+1}/${steps.length}步：${steps[current].textContent}`;
+    }
+    const node = event.target.closest?.('[data-component]');
+    if (node) {
+      const definition = (model.components || []).find(c => c.id === node.dataset.component);
+      if (!definition) return;
+      const body = nodeDialog.querySelector('.reader-dialog-body');
+      body.replaceChildren();
+      for (const [key, label] of [['title','组件'],['body','职责'],['artifact','引入形式'],['owner','责任方'],['scope','范围'],['acceptance','验收']]) {
+        if (definition[key]) { const p = document.createElement('p'), strong = document.createElement('strong'); strong.textContent = label + '：'; p.append(strong, document.createTextNode(definition[key])); body.append(p); }
+      }
+      for (const id of definition.evidence || []) {
+        const evidence = (model.evidence || []).find(e => e.id === id); if (!evidence) continue;
+        const p = document.createElement('p'); p.textContent = `依据 ${id}：${evidence.summary}；来源：${evidence.source}；定位：${evidence.locator || '未提供'}；限制：${evidence.limitation || '未说明'}`; body.append(p);
+      }
+      open(nodeDialog, node);
+    }
+  });
+  let zoom = 1, fit = 1;
+  const preview = figure.querySelector('img'), stage = figure.querySelector('.figure-stage');
+  function sizeFigure() { if (preview.naturalWidth) { fit = Math.min((stage.clientWidth-28)/preview.naturalWidth, (stage.clientHeight-28)/preview.naturalHeight, 1); preview.style.width = Math.max(1, preview.naturalWidth*fit*zoom) + 'px'; } }
+  preview.addEventListener('load', sizeFigure);
+  figure.querySelectorAll('[data-zoom]').forEach(button => button.addEventListener('click', () => { zoom = button.dataset.zoom === 'in' ? Math.min(8,zoom*1.5) : Math.max(.5,zoom/1.5); sizeFigure(); }));
+  preview.addEventListener('click', () => figure.close());
+  function openFigure(trigger, src) { zoom = 1; preview.alt = trigger.alt || trigger.textContent || '架构图'; preview.src = src; open(figure, trigger); if (preview.complete) sizeFigure(); }
+  document.addEventListener('click', event => {
+    if (event.target.closest?.('#figure-dialog')) return;
+    const image = event.target.closest?.('.report-figure img'), button = event.target.closest?.('[data-image-src]');
+    if (image) openFigure(image, image.src);
+    else if (button) openFigure(button, button.dataset.imageSrc);
+  });
+  document.addEventListener('keydown', event => {
+    const target = event.target.closest?.('[data-component],.report-figure img');
+    if (target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); target.dispatchEvent(new MouseEvent('click', { bubbles: true })); }
+  });
+  addEventListener('resize', () => { if (figure.open) sizeFigure(); });
+})();
+
+(() => {
+  'use strict';
+  document.querySelector('[data-print-report]')?.addEventListener('click', () => window.print());
+  const model = JSON.parse(document.getElementById('report-data').textContent);
+  const tooltip = document.getElementById('citation-popover');
+  let preview = null;
+  function hideCitation() {
+    tooltip.hidden = true;
+    preview?.removeAttribute('aria-describedby');
+    preview = null;
+  }
+  function showCitation(link) {
+    const entry = (model.evidence || []).find(item => item.id === link.dataset.evidence);
+    if (!entry) return;
+    const parent = link.closest('dialog') || document.body;
+    if (tooltip.parentElement !== parent) parent.append(tooltip);
+    const heading = document.createElement('strong'), summary = document.createElement('p'), source = document.createElement('small');
+    heading.textContent = '来源 ' + link.textContent;
+    const shorten = (value, limit) => value.length > limit ? value.slice(0,limit) + '…' : value;
+    summary.textContent = shorten(entry.summary,180);
+    source.textContent = shorten(entry.source,110) + (entry.limitation ? ' · 限制：' + shorten(entry.limitation,100) : '') + ' · 点击查看完整来源';
+    link.removeAttribute('title'); // Native title remains available without JavaScript.
+    tooltip.replaceChildren(heading, summary, source);
+    preview?.removeAttribute('aria-describedby');
+    preview = link;
+    link.setAttribute('aria-describedby', 'citation-popover');
+    tooltip.hidden = false;
+    const rect = link.getBoundingClientRect(), box = tooltip.getBoundingClientRect();
+    tooltip.style.left = Math.max(12, Math.min(innerWidth - box.width - 12, rect.left)) + 'px';
+    tooltip.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, rect.bottom + 10)) + 'px';
+  }
+  for (const type of ['mouseover', 'focusin']) document.addEventListener(type, event => { const link = event.target.closest?.('.evidence-ref'); if (link) showCitation(link); });
+  for (const type of ['mouseout', 'focusout']) document.addEventListener(type, event => { if (event.target.closest?.('.evidence-ref')) hideCitation(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') hideCitation(); });
+  document.addEventListener('report-panelchange', hideCitation);
+  addEventListener('resize', hideCitation);
+  addEventListener('scroll', hideCitation, true);
+  document.addEventListener('click', event => { if (event.target.closest?.('.evidence-ref')) hideCitation(); });
+  if (model.readingMode === 'continuous') return;
+
+  function positionHeadingNote(note) {
+    const button = note.querySelector('.heading-help'), tip = note.querySelector('.heading-tooltip');
+    button.removeAttribute('title'); // Keep the native title only as the no-script fallback.
+    const rect = button.getBoundingClientRect(), box = tip.getBoundingClientRect();
+    const mobile = matchMedia('(max-width:760px)').matches;
+    const left = mobile ? rect.left : rect.right + 10;
+    const top = mobile ? rect.bottom + 8 : rect.top + (rect.height - box.height) / 2;
+    tip.style.left = Math.max(12, Math.min(innerWidth - box.width - 12, left)) + 'px';
+    tip.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, top)) + 'px';
+    button.setAttribute('aria-expanded', 'true');
+  }
+  function dismissHeadingNotes(except=null) {
+    document.querySelectorAll('.heading-note').forEach(note => {
+      if (note !== except) {
+        note.classList.remove('is-open'); note.classList.add('is-dismissed');
+        note.querySelector('.heading-help').setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+  document.addEventListener('click', event => {
+    const button = event.target.closest?.('.heading-help');
+    if (!button) { dismissHeadingNotes(); return; }
+    const note = button.closest('.heading-note');
+    const opening = !note.classList.contains('is-open');
+    dismissHeadingNotes(note);
+    note.classList.toggle('is-open', opening);
+    note.classList.toggle('is-dismissed', !opening);
+    if (opening) positionHeadingNote(note);
+    else button.setAttribute('aria-expanded', 'false');
+  });
+  for (const type of ['mouseover','focusin']) document.addEventListener(type,event => {
+    const note=event.target.closest?.('.heading-note');
+    if (note && !note.contains(event.relatedTarget)) {
+      dismissHeadingNotes(note);
+      note.classList.remove('is-dismissed');
+      positionHeadingNote(note);
+    }
+  });
+  for (const type of ['mouseout','focusout']) document.addEventListener(type,event => {
+    const note=event.target.closest?.('.heading-note');
+    if (note && !note.contains(event.relatedTarget) && !note.classList.contains('is-open')) note.querySelector('.heading-help').setAttribute('aria-expanded', 'false');
+  });
+  document.addEventListener('keydown',event => { if (event.key==='Escape') dismissHeadingNotes(); });
+  document.addEventListener('report-panelchange',()=>dismissHeadingNotes());
+  addEventListener('resize',()=>dismissHeadingNotes());
+  addEventListener('scroll',()=>dismissHeadingNotes(),true);
+
+  const outline = document.getElementById('report-outline');
+  const panels = [...document.querySelectorAll('.shell > [data-chapter]')];
+  const links = [...outline.querySelectorAll('nav a')];
+  const decode = hash => { try { return decodeURIComponent(hash.slice(1)); } catch { return ''; } };
+  function measureNavigation() {
+    document.documentElement.style.setProperty('--focus-nav-height', matchMedia('(max-width:760px)').matches ? outline.offsetHeight + 'px' : '0px');
+  }
+  function activate(hash, { push = false, focus = false, scroll = true } = {}) {
+    const target = document.getElementById(decode(hash)) || panels[0];
+    const panel = target.closest('.shell > [data-chapter]');
+    if (!panel) return false;
+    hideCitation();
+    document.dispatchEvent(new Event('report-panelchange'));
+    for (const item of panels) item.classList.toggle('is-active', item === panel);
+    for (const link of links) {
+      if (link.getAttribute('href') === '#' + panel.id) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    }
+    const activeLink = links.find(link => link.hasAttribute('aria-current'));
+    document.getElementById('reading-position').textContent = `${panel.dataset.chapter} / ${panels.length} · ${activeLink?.querySelector('span:last-child')?.textContent || ''}`;
+    if (target.tagName === 'DETAILS') target.open = true;
+    for (let parent = target.parentElement; parent && parent !== panel; parent = parent.parentElement) if (parent.tagName === 'DETAILS') parent.open = true;
+    panel.querySelector(':scope > .section-content > details[data-primary]')?.setAttribute('open', '');
+    const destination = target === panel ? panel.querySelector('h2') : target;
+    if (push && location.hash !== hash) history.pushState(null, '', hash);
+    requestAnimationFrame(() => {
+      measureNavigation();
+      if (scroll) {
+        if (target === panel && !matchMedia('(max-width:760px)').matches) window.scrollTo({ top: 0, behavior: 'instant' });
+        else target.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }
+      if (focus) {
+        if (!destination.hasAttribute('tabindex')) destination.setAttribute('tabindex', '-1');
+        destination.focus({ preventScroll: true });
+      }
+    });
+    return true;
+  }
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('a[href^="#"]');
+    if (!link || link.classList.contains('term') || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.button !== 0) return;
+    const hash = link.getAttribute('href');
+    if (!document.getElementById(decode(hash))?.closest('.shell > [data-chapter]')) return;
+    event.preventDefault();
+    link.closest('dialog[open]')?.close();
+    activate(hash, { push: true, focus: true });
+  });
+  outline.addEventListener('keydown', event => {
+    const index = links.indexOf(document.activeElement);
+    if (index < 0 || !['ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? links.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length;
+    links[next].focus();
+  });
+  const restore = () => activate(location.hash || '#overview', { focus: true });
+  addEventListener('popstate', restore);
+  addEventListener('hashchange', restore);
+  addEventListener('resize', measureNavigation);
+  activate(location.hash || '#overview', { scroll: !!location.hash });
+  document.documentElement.classList.add('focus-ready');
+  measureNavigation();
+})();
+
+(() => {
+  'use strict';
+  function measure(diagram) {
+    const selected = diagram.querySelector('.diagram-scene.is-selected .change-diagram-canvas');
+    if (selected && selected.clientWidth) diagram.classList.toggle('diagram-has-overflow', selected.scrollWidth > selected.clientWidth + 2);
+  }
+  function select(diagram, state) {
+    const buttons = [...diagram.querySelectorAll('[data-diagram-view]')];
+    const scenes = [...diagram.querySelectorAll('[data-diagram-state]')];
+    for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.diagramView === state));
+    for (const scene of scenes) scene.classList.toggle('is-selected', scene.dataset.diagramState === state);
+    measure(diagram);
+  }
+  // Delegation also serves chapter copies in the optional continuous reader.
+  document.addEventListener('click', event => {
+    const button = event.target.closest?.('[data-diagram-view]');
+    if (button) select(button.closest('[data-change-diagram]'), button.dataset.diagramView);
+  });
+  document.querySelectorAll('[data-change-diagram]').forEach(diagram => {
+    const scenes = [...diagram.querySelectorAll('[data-diagram-state]')];
+    if (!scenes.length) return;
+    diagram.classList.add('diagrams-ready');
+    select(diagram, scenes.length === 1 ? scenes[0].dataset.diagramState : 'change');
+    if ('ResizeObserver' in window) new ResizeObserver(() => measure(diagram)).observe(diagram);
+  });
+  window.addEventListener('resize', () => document.querySelectorAll('[data-change-diagram]').forEach(measure));
+})();
+</script></body></html>

@@ -1,0 +1,290 @@
+{
+  "title": "处理能力怎样并入现有服务",
+  "generatedAt": "虚构示例",
+  "reportType": "brief",
+  "readingMode": "focus",
+  "subtitle": "先看接法变化，再看验收和边界；全部内容均为虚构方案。",
+  "scope": [
+    "未运行服务，不构成业务验收"
+  ],
+  "verdict": {
+    "label": "沿用原入口，在同一进程补上处理能力",
+    "summary": "原页面继续使用，新增处理能力包（SDK）和状态查询。[[E1]]",
+    "diagramId": "integration",
+    "next": "集成组先接通提交、处理、查询，再验无效输入和重复请求。",
+    "topics": [
+      "checks",
+      "bounds"
+    ],
+    "progress": [
+      {
+        "title": "改造与验收",
+        "status": "待实施",
+        "summary": "虚构方案，所有验收待执行。",
+        "evidence": [
+          "E2"
+        ]
+      }
+    ]
+  },
+  "findings": [],
+  "evidence": [
+    {
+      "id": "E1",
+      "level": "SOURCE_BUILD",
+      "source": "虚构设计稿",
+      "summary": "演示保留原入口、引入进程内能力的设计。",
+      "locator": "接法说明",
+      "limitation": "设计材料，不证明已经实现。"
+    },
+    {
+      "id": "E2",
+      "level": "RUNTIME_UI",
+      "source": "虚构验收计划",
+      "summary": "要求有效输入可查询结果，重复请求不重复处理。",
+      "accessNote": "示例没有真实测试记录。",
+      "limitation": "计划，不是执行结果。"
+    }
+  ],
+  "diagrams": [
+    {
+      "id": "integration",
+      "title": "接法变化",
+      "kind": "architecture",
+      "direction": "LR",
+      "note": "虚构对比：改前只展示提交入口，后续处理和返回未展开；改后展示待实施的校验、处理与查询职责。",
+      "nodes": [
+        {
+          "id": "page",
+          "label": "原页面＋状态查询",
+          "beforeLabel": "原页面",
+          "shape": "process",
+          "change": "modified",
+          "column": 0,
+          "row": 0
+        },
+        {
+          "id": "host",
+          "label": "原服务入口",
+          "shape": "process",
+          "column": 1,
+          "row": 0
+        },
+        {
+          "id": "validate",
+          "label": "输入校验",
+          "shape": "process",
+          "change": "added",
+          "column": 2,
+          "row": 0
+        },
+        {
+          "id": "sdk",
+          "label": "任务处理",
+          "shape": "process",
+          "change": "added",
+          "column": 3,
+          "row": 0
+        },
+        {
+          "id": "query",
+          "label": "结果查询",
+          "shape": "process",
+          "change": "added",
+          "column": 2,
+          "row": 1
+        }
+      ],
+      "edges": [
+        {
+          "from": "page",
+          "to": "host",
+          "label": "提交请求"
+        },
+        {
+          "from": "host",
+          "to": "validate",
+          "label": "校验输入",
+          "change": "added"
+        },
+        {
+          "from": "validate",
+          "to": "sdk",
+          "label": "合法则处理",
+          "change": "added"
+        },
+        {
+          "from": "host",
+          "to": "query",
+          "label": "按编号查询",
+          "change": "added"
+        }
+      ],
+      "groups": [
+        {
+          "id": "host-process",
+          "label": "同一服务进程",
+          "nodes": [
+            "host",
+            "validate",
+            "sdk",
+            "query"
+          ]
+        }
+      ],
+      "evidence": [
+        "E1"
+      ]
+    },
+    {
+      "id": "acceptance",
+      "title": "成功与拒绝都要验证",
+      "kind": "flow",
+      "direction": "TB",
+      "note": "待执行的验收计划；箭头文字说明分支，不执行业务。",
+      "nodes": [
+        {
+          "id": "start",
+          "label": "开始",
+          "shape": "terminator",
+          "column": 0,
+          "row": 0
+        },
+        {
+          "id": "input",
+          "label": "提交输入",
+          "shape": "data",
+          "column": 0,
+          "row": 1
+        },
+        {
+          "id": "valid",
+          "label": "输入有效？",
+          "shape": "decision",
+          "column": 0,
+          "row": 2
+        },
+        {
+          "id": "save",
+          "label": "记录唯一结果",
+          "shape": "store",
+          "column": 0,
+          "row": 3
+        },
+        {
+          "id": "reject",
+          "label": "拒绝并提示原因",
+          "shape": "process",
+          "column": 1,
+          "row": 2
+        },
+        {
+          "id": "end",
+          "label": "可查询结果",
+          "shape": "terminator",
+          "column": 0,
+          "row": 4
+        }
+      ],
+      "edges": [
+        {
+          "from": "start",
+          "to": "input",
+          "label": "开始提交"
+        },
+        {
+          "from": "input",
+          "to": "valid",
+          "label": "校验输入"
+        },
+        {
+          "from": "valid",
+          "to": "save",
+          "label": "是：去重处理"
+        },
+        {
+          "from": "valid",
+          "to": "reject",
+          "label": "否：拒绝",
+          "style": "dashed"
+        },
+        {
+          "from": "save",
+          "to": "end",
+          "label": "返回编号"
+        }
+      ],
+      "evidence": [
+        "E2"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "checks",
+      "title": "验收",
+      "subtitle": "怎样确认结果可信？",
+      "summary": "核对成功、拒绝和重复请求，保留同一编号。[[E2]]",
+      "kind": "diagram",
+      "diagramId": "acceptance"
+    },
+    {
+      "id": "bounds",
+      "title": "边界",
+      "subtitle": "哪些内容仍需补齐？",
+      "summary": "SDK 只负责处理能力，宿主仍负责入口与数据归属。[[E1]]",
+      "kind": "table",
+      "columns": [
+        "负责方",
+        "动作"
+      ],
+      "rows": [
+        [
+          "宿主",
+          "校验入口、关联请求与结果。"
+        ],
+        [
+          "集成组",
+          "核对事务与异常恢复，再登记验收结果。[[E2]]"
+        ]
+      ],
+      "folds": [
+        {
+          "title": "原示意图",
+          "kind": "figure",
+          "figure": {
+            "src": "assets/architecture.svg",
+            "alt": "虚构原架构示意",
+            "caption": "示意图用于图片交互检查，不是运行截图。",
+            "evidence": [
+              "E1"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "SDK",
+      "full": "软件开发工具包",
+      "explanation": "这里指供原服务直接调用的能力包。",
+      "aliases": [
+        "能力包"
+      ],
+      "scopeNote": "本例用词，不表示已有可发布产物。"
+    }
+  ],
+  "highlights": [
+    {
+      "label": "先验什么",
+      "value": "成功、拒绝、重复请求",
+      "target": "checks"
+    },
+    {
+      "label": "范围",
+      "value": "虚构方案，尚待实施",
+      "target": "bounds"
+    }
+  ]
+}

@@ -35,7 +35,7 @@ class VisibleText(HTMLParser):
 
 def sample():
     return {
-        "title": "接口交接核验", "generatedAt": "2026-10-08", "reportType": "handoff",
+        "title": "接口交接核验", "generatedAt": "2026-10-08", "reportType": "handoff", "readingMode": "continuous",
         "verdict": {"label": "待联调", "summary": "实现已登记，尚待业务验收。"},
         "findings": [{"id": "问题一", "title": "结果尚未持久化验证", "status": "partial", "summary": "运行日志不能证明数据入库。", "assessment": ["保留独立业务验收"], "actions": ["核对持久化结果"], "evidence": ["证据一"]}],
         "evidence": [{"id": "证据一", "level": "SOURCE_BUILD", "source": "git:example:src/Result.java:10", "summary": "源码存在结果处理入口。", "date": "2026-10-08", "limitation": "尚未进行真实联调"}],
@@ -163,7 +163,7 @@ class BuilderTests(unittest.TestCase):
         self.assertIn('id="evidence-2"', output)
         self.assertIn('未提供可访问原项，需按日期核对', output)
         self.assertIn('2026-10-07 / 检查1至3', output)
-        self.assertIn('证据清单与原项入口', output)
+        self.assertIn('查看逐项依据', output)
         self.assertIn('入口存在', output)
 
     def test_context_evidence_references_reject_missing_ids(self):
@@ -209,6 +209,34 @@ class BuilderTests(unittest.TestCase):
         html = render(data)
         self.assertNotIn('id="findings-section"', html)
         self.assertNotIn('id="metrics"', html)
+        self.assertNotIn('id="evidence-layers"', html)
+        self.assertNotIn('id="appendix"', html)
+        self.assertNotIn('class="view-controls', html)
+
+    def test_plain_brief_leads_with_impact_and_next_step(self):
+        data = sample()
+        data.update(reportType="brief", findings=[], evidence=[])
+        data["verdict"] = {
+            "label": "保留单进程接入",
+            "summary": "现有入口可以继续使用，不需要新增服务。",
+            "impact": "现场只维护一个进程，升级和排障路径更短。",
+            "next": "集成组先核对依赖版本，再跑一次成功和失败场景。",
+        }
+        html = render(data)
+        visible = VisibleText(); visible.feed(html)
+        text = " ".join(visible.parts)
+        for expected in ("保留单进程接入", "这意味着：", "现场只维护一个进程", "下一步：", "集成组先核对依赖版本"):
+            self.assertIn(expected, text)
+        self.assertNotIn("需要先解决", text)
+
+    def test_brief_readability_warnings_do_not_break_legacy_input(self):
+        data = sample()
+        data.update(reportType="brief", findings=[], evidence=[], sections=[{"id": f"topic-{i}", "title": f"主题{i}", "items": []} for i in range(8)])
+        data["metrics"] = [{"label": str(i), "value": i} for i in range(5)]
+        warnings = builder.readability_warnings(data)
+        self.assertTrue(any("8 个顶层主题" in item for item in warnings))
+        self.assertTrue(any("指标卡超过 4 个" in item for item in warnings))
+        self.assertIn("主题7", render(data))
 
     def test_print_contains_every_finding_action_and_evidence(self):
         html = render(sample())

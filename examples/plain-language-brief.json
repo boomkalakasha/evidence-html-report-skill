@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "defaultView": "full",
+  "reportType": "brief",
+  "title": "本地文件转换工具接入建议",
+  "generatedAt": "示例",
+  "audience": "产品负责人、集成开发和交付人员",
+  "verdict": {
+    "label": "推荐保留单进程接入，不新增独立服务",
+    "summary": "现有宿主已经能直接加载转换能力；拆成第二个服务只会增加部署、账号和排障成本。",
+    "impact": "现场仍只维护一个进程，原有调用入口不变，升级时只需要核对一组版本。",
+    "next": "集成开发先固定依赖版本，再完成成功、无效输入和重复请求三个场景。",
+    "blocker": "批量任务中断后的恢复还没有真实验证，首轮交付不能宣称支持断点续跑。"
+  },
+  "findings": [],
+  "evidence": [],
+  "sections": [
+    {
+      "id": "difference",
+      "title": "现在和以前有什么不同",
+      "kind": "table",
+      "columns": ["以前", "现在", "对使用者的影响"],
+      "rows": [
+        ["调用远端演示接口", "宿主直接加载本地转换包", "不再依赖第二个进程"],
+        ["版本由人工记录", "宿主统一固定依赖版本", "升级和回退有明确对象"]
+      ]
+    },
+    {
+      "id": "integration",
+      "title": "推荐怎么接",
+      "kind": "flow",
+      "steps": [
+        {"title": "宿主接收文件", "body": "沿用现有上传入口。", "edge": "进程内调用"},
+        {"title": "转换包处理", "body": "返回结果或明确错误。", "edge": "保存结果"},
+        {"title": "宿主展示结果", "body": "页面继续使用原有任务编号查询。"}
+      ]
+    },
+    {
+      "id": "work",
+      "title": "先做哪些工作",
+      "kind": "checklist",
+      "items": [
+        {"title": "固定版本", "body": "选择一组已验证的宿主和转换包版本。", "owner": "集成开发", "acceptance": "构建产物能反查两边版本"},
+        {"title": "跑三个场景", "body": "覆盖成功、无效输入和重复请求。", "owner": "交付人员", "acceptance": "页面结果与任务记录一致"}
+      ]
+    },
+    {
+      "id": "remaining",
+      "title": "还剩什么问题",
+      "kind": "cards",
+      "items": [
+        {"title": "中断恢复", "body": "尚未验证批量任务中途退出后的恢复结果。", "status": "unverified"},
+        {"title": "大文件耗时", "body": "需要在目标设备上记录一组真实耗时。", "status": "not_run"}
+      ]
+    },
+    {
+      "id": "verify",
+      "title": "去哪里核验",
+      "paragraphs": ["本页只保留决定和行动，完整字段、历史比较及恢复步骤放在单独材料中。"],
+      "links": [
+        {"label": "查看脱敏完整说明", "href": "./plain-language-details.md"}
+      ]
+    }
+  ]
+}

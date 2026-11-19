@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "defaultView": "brief",
+  "title": "接入方案与职责：共享资料示例",
+  "generatedAt": "虚构示例，非业务验收",
+  "reportType": "brief",
+  "verdict": {"label": "先确定判定位置，再选择组件", "summary": "远程方案由中央服务判定，本地方案由业务进程判定；业务后端都保留原有业务检查。", "blocker": "离线数据交付仅为未来方案，当前没有可执行的导出或导入功能。", "evidence": ["来源一"]},
+  "scope": ["仅用于验证报告生成与阅读；不表示真实系统已接入"],
+  "findings": [],
+  "evidence": [{"id":"来源一","level":"SOURCE_BUILD","source":"虚构设计记录","summary":"为两种判定位置提供组件关系示例。","locator":"本示例 components、graphs 和 scenarios","limitation":"不能证明真实系统实现或运行结果。"}],
+  "components": [
+    {"id":"business","title":"业务后端","body":"验证身份与真实资源，执行最终允许或拒绝，并保留原业务检查。","artifact":"业务应用","owner":"业务接入方","evidence":["来源一"]},
+    {"id":"remote","title":"远程权限服务","body":"在独立进程读取当前权限并返回判定。","artifact":"独立服务","owner":"中央维护方","evidence":["来源一"]},
+    {"id":"local","title":"本地权限引擎","body":"由业务进程加载，从可信适配接口读取当前权限。","artifact":"普通组件包","owner":"业务接入方","evidence":["来源一"]},
+    {"id":"data","title":"权限数据","body":"提供当前成员与资源授权；数据本身不执行鉴权。","artifact":"数据库或可信适配","owner":"选定的数据维护方","evidence":["来源一"]}
+  ],
+  "graphs": [
+    {"id":"remote","title":"远程判定关系","nodes":[{"id":"entry","component":"business"},{"id":"engine","component":"remote"},{"id":"store","component":"data"}],"edges":[{"from":"entry","to":"engine","label":"HTTPS 请求"},{"from":"engine","to":"store","label":"读取当前授权"}]},
+    {"id":"local","title":"本地判定关系","nodes":[{"id":"entry","component":"business"},{"id":"engine","component":"local"},{"id":"store","component":"data"}],"edges":[{"from":"entry","to":"engine","label":"进程内调用"},{"from":"engine","to":"store","label":"可信数据适配"}]},
+    {"id":"future","title":"未来数据交付关系","nodes":[{"id":"central","component":"remote"},{"id":"store","component":"data"},{"id":"engine","component":"local"}],"edges":[{"from":"central","to":"store","label":"待实现导出","state":"planned"},{"from":"store","to":"engine","label":"待实现导入","state":"planned"}]}
+  ],
+  "scenarios": [
+    {"id":"remote-use","title":"远程接入","summary":"中央服务负责判定，业务方负责执行。","graphId":"remote","state":"current","evidence":["来源一"],"steps":[{"node":"entry","body":"业务后端核对当前身份和真实资源。"},{"node":"engine","body":"远程服务读取权限并返回允许或拒绝。"},{"node":"entry","body":"业务后端允许后继续原业务检查。"}]},
+    {"id":"local-use","title":"本地接入","summary":"本地组件负责判定，不需要独立中央调用。","graphId":"local","state":"current","steps":[{"node":"entry","body":"业务后端取得可信身份与资源。"},{"node":"engine","body":"本地引擎读取当前授权并判定。"}]},
+    {"id":"future-use","title":"离线数据交付（未来方案）","summary":"展示目标关系，不能按现成功能执行。","graphId":"future","state":"planned","steps":[]}
+  ],
+  "sections": [
+    {"id":"choose","title":"接入方案与运行关系","summary":"切换同一模型内的有效场景；图、职责和讲解共享组件资料。","kind":"explorer","scenarioIds":["remote-use","local-use","future-use"]},
+    {"id":"figure","title":"关键执行顺序","kind":"figure","figure":{"src":"assets/architecture.svg","alt":"业务入口经过权限判定，允许后继续执行业务。","caption":"静态图同样可以原生内嵌并放大。","evidence":["来源一"]}},
+    {"id":"work","title":"完整适配与验收职责","summary":"接入方核对身份、资源、允许、拒绝与撤权结果；点击目录可阅读完整内容。","kind":"checklist","detailOnly":true,"items":[{"title":"接入方","body":"在所有业务入口使用同一判定边界。","owner":"业务接入方","acceptance":"覆盖允许、拒绝及权限变化后的下一次操作。","evidence":["来源一"]},{"title":"版本与边界","body":"说明只展示架构，不代替目标环境验收。","acceptance":"确认真实部署、数据及调用链后再宣称可用。"}]}
+  ],
+  "glossary": [{"term":"HTTPS","full":"加密的 HTTP 通信","explanation":"用于保护远程请求的传输；不替代身份和业务权限检查。"}]
+}

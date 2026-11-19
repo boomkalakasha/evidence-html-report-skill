@@ -16,10 +16,17 @@ spec.loader.exec_module(builder)
 def run(output):
     output.mkdir(parents=True, exist_ok=True)
     brief = output / "brief.html"
-    builder.build(ROOT / "examples/technical-brief.json", brief)
+    def legacy_build(example, target):
+        content = json.loads((ROOT / 'examples' / example).read_text(encoding='utf-8'))
+        content['readingMode'] = 'continuous'
+        fixture = output / (target.stem + '-data.json')
+        fixture.write_text(json.dumps(content, ensure_ascii=False), encoding='utf-8')
+        builder.build(fixture, target)
+    legacy_build('technical-brief.json', brief)
     reading = output / "reading.html"
-    builder.build(ROOT / "examples/reading-layout.json", reading)
+    legacy_build('reading-layout.json', reading)
     data = json.loads((ROOT / "examples/audit.json").read_text(encoding="utf-8"))
+    data['readingMode'] = 'continuous'
     data["findings"][1]["summary"] = "页面 API 可显示错误，尚待独立业务核对。"
     source, audit = output / "audit-data.json", output / "audit.html"
     source.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
@@ -27,6 +34,7 @@ def run(output):
     checks = []
     options = output / 'options.html'
     option_data = json.loads((ROOT / 'examples/annotated-options.json').read_text(encoding='utf-8'))
+    option_data['readingMode'] = 'continuous'
     option_data['glossary'][0]['original'] += '\n' + '长原文仍应完整保存在释义详情中。' * 100
     option_data['glossary'][0]['scopeNote'] = '长边界说明只在浮层预览，完整内容在详情中保留。' * 50
     option_source = output / 'options-data.json'
@@ -104,7 +112,8 @@ def run(output):
         assert all(page.locator(".flow-edge").evaluate_all("elements => elements.map(element => element.getBoundingClientRect().height > 0)"))
         assert "HTTP 请求" in page.locator(".flow").inner_text()
         page.locator('.nav a[href="#contracts"]').click()
-        assert page.evaluate("location.hash") == "#contracts"
+        assert page.locator('#chapter-dialog').is_visible()
+        assert '契约' in page.locator('#chapter-dialog').inner_text()
         page.screenshot(path=str(output / "brief-mobile.png"), full_page=True)
         page.set_viewport_size({"width": 1440, "height": 1000})
         page.goto(brief.as_uri())
@@ -123,8 +132,12 @@ def run(output):
         assert not any(page.locator('details[data-fold]').evaluate_all('elements => elements.map(element => element.open)'))
         page.locator('.nav a[href="#roles"]').click()
         assert not any(page.locator('#roles details').evaluate_all('elements => elements.map(element => element.open)')), '章节导航不应打开补充折叠'
+        page.keyboard.press('Escape')
         page.locator('.nav a[href="#checks"]').click()
-        assert page.locator('#checks > details').get_attribute('open') is not None
+        assert page.locator('#chapter-dialog [data-original-id="checks"] details[data-primary]').get_attribute('open') is not None
+        page.keyboard.press('Escape')
+        # dialog.close dispatches close asynchronously; exclude its transient clone.
+        page.wait_for_function("document.getElementById('chapter-body').childElementCount === 0")
         prior = page.locator('details[data-fold]').evaluate_all('elements => elements.map(element => element.open)')
         page.evaluate("window.dispatchEvent(new Event('beforeprint')); window.dispatchEvent(new Event('beforeprint'))")
         assert all(page.locator('details[data-fold]').evaluate_all('elements => elements.map(element => element.open)'))
@@ -143,10 +156,11 @@ def run(output):
         checks.append('正文就近折叠、默认开闭、批量展开收起、导航展开、安全链接、手机表头与打印恢复')
         page.set_viewport_size({'width':1440,'height':1000})
         page.goto(reading.as_uri())
-        page.locator('#report-outline > summary').click()
+        reading_chapters = page.locator('.shell>section[data-chapter]').count()
+        assert page.locator('#report-outline').evaluate("element=>getComputedStyle(element).position") == 'fixed'
         page.locator('#report-outline a[href="#outline-2-1"]').click()
-        assert page.locator('#outline-2-1').get_attribute('open') is not None
-        page.wait_for_function("document.querySelector('#reading-position').textContent.includes('2 / 6')")
+        assert page.locator('#chapter-dialog [data-original-id="outline-2-1"]').get_attribute('open') is not None
+        page.wait_for_function("expected => document.querySelector('#reading-position').textContent.includes(expected)", arg=f'2 / {reading_chapters}')
         assert page.locator('.nav a[aria-current="location"]').get_attribute('href') == '#roles'
         page.goto(reading.as_uri())
         page.locator('#overview a[href="#evidence-2"]').click()
@@ -164,8 +178,10 @@ def run(output):
         page.goto(reading.as_uri()+'#evidence-2')
         assert page.locator('#evidence-2').is_visible(), '直接打开凭证锚点需展开父级'
         page.wait_for_function("document.querySelector('#evidence-2').getBoundingClientRect().top < innerHeight-80")
-        page.locator('.nav a[href="#appendix"]').click()
-        page.wait_for_function("document.querySelector('#reading-position').textContent.includes('6 / 6')")
+        # Empty appendices have intentionally been omitted since 1.5.0.
+        assert page.locator('.nav a[href="#appendix"]').count() == 0
+        page.locator('.nav a[href="#evidence-layers"]').click()
+        page.wait_for_function("expected => document.querySelector('#reading-position').textContent.includes(expected)", arg=f'{reading_chapters} / {reading_chapters}')
         assert '完成率' not in page.locator('#reading-position').inner_text()
         checks.append('目录与章节编号、按节展开、当前章节、逐项凭证跳转、原项链接与无法跳转说明')
         page.goto(options.as_uri())

@@ -23,7 +23,7 @@
 
 ## 快速体验
 
-想先看成品，可以[下载可交互的 HTML 示例](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html)，下载后用浏览器打开。这是离线文件，当前没有托管的在线演示页。
+想先看成品，可以[下载示例 ZIP](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes-demo.zip)，解压后用浏览器打开其中的 `focus-changes.html`，无需 Python。这是离线文件，当前没有托管的在线演示页。
 
 自己生成时，下载正式版 ZIP 并解压。进入含 `SKILL.md` 的 `evidence-html-report/` 目录，用 Python 3 运行下面的命令；这一步无需安装 Codex，也不需要额外的 Python 依赖。
 
@@ -35,7 +35,7 @@ python scripts/build_report.py --strict examples/focus-changes.json output-focus
 
 ## 你会看到什么
 
-[下载完整交互 HTML](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes.html) · [查看可编辑的 JSON 输入](examples/focus-changes.json)
+[下载交互示例 ZIP](https://github.com/boomkalakasha/evidence-html-report-skill/raw/refs/heads/main/examples/focus-changes-demo.zip) · [查看可编辑的 JSON 输入](examples/focus-changes.json)
 
 ![公开示例报告：主题目录、核心结论、接法变化图和来源入口](docs/images/report-preview.png)
 
